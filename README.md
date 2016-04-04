@@ -19,3 +19,4 @@ Câmpus Barbacena
 .
 "ué"
 
+SUPLA (1, 2)
