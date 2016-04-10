@@ -4,8 +4,8 @@ class sala:
 		self.id = ID
 		self.s = []
 		
-	def adicionaConexao(self, s, nome):
-		self.s.append([s,nome])
+	def adicionaConexao(self, s, nome,ip):
+		self.s.append([s,nome,ip])
 		print 'conectou',self.s
 
 	def enviaMsg(self, nomeSala, msg, nome):

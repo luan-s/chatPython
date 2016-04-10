@@ -1,22 +1,23 @@
 import socket
 import sala
  
-TCP_IP = '127.0.0.1'
+TCP_IP = socket.gethostbyname(socket.gethostname())
 TCP_PORT = 8000
 salas = sala.sala()
 BUFFER_SIZE = 2048  # Normally 1024, but we want fast response
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((TCP_IP, TCP_PORT))
+print "Rodando no ip: ",TCP_IP," \nporta: ",TCP_PORT
 while True:
 	s.listen(1)
 	conn, addr = s.accept()
-
+	print dir(conn)
 	print 'Connection address:', addr
 
 	data = conn.recv(BUFFER_SIZE)
 
 	if(data[:2] == 'CS'): #Cria Sala
-		salas.adicionaConexao(conn,data[2:])
+		salas.adicionaConexao(conn,data[2:],addr[0])
 
 	if(data[:2] == 'EM'): #Envia Msg
 		msg = data.split('KEYCONTROLLER')

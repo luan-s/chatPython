@@ -3,7 +3,7 @@ import socket
 import sala
 
 KEYCONTROLLER = 'KEYCONTROLLER'
-TCP_IP = '127.0.0.1'
+TCP_IP = '192.168.56.1'
 TCP_PORT = 8000
 BUFFER_SIZE = 2048
 
@@ -30,9 +30,6 @@ def separaNomeSala(lista, op):
 #separaNomeSala():
 
 def envia():
-	TCP_IP = '127.0.0.1'
-	TCP_PORT = 8000
-	BUFFER_SIZE = 2048
 	nome = raw_input("Seu nome: ")
 
 	MESSAGE = "LS"
@@ -40,7 +37,7 @@ def envia():
 	s.send(MESSAGE)
 	data = s.recv(BUFFER_SIZE)
 	print "Salas:"
-	print data
+	print data.split('\n')
 	sala = raw_input("Escolha uma sala: ")
 
 	sala = separaNomeSala(data.split('\n'),sala)
