@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 #encoding: utf-8
+=======
+# coding: utf-8
+
+>>>>>>> 0501b425fd070e6f61049e4bd3e50ed8cedbde0e
 import socket
 import sala
 import threading
@@ -21,6 +26,8 @@ def trocaStatus(codBotao):
 
 def iniciaThread():
 	trocaStatus(1)
+	t1_stop = threading.Event()
+	t1 = threading.Thread(target = thread1, args = (1, t1_stop))
 	t1.start()
 
 def thread1(arg1, eventoDeParada):
@@ -53,10 +60,9 @@ def parar():
 	trocaStatus(2)
 
 status = False
-t1_stop = threading.Event()
-t1 = threading.Thread(target = thread1, args = (1, t1_stop))
 TCP_IP = socket.gethostbyname(socket.gethostname())
 TCP_PORT = 8000
+t1_stop = threading.Event()
 salas = sala.sala()
 BUFFER_SIZE = 2048  
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
