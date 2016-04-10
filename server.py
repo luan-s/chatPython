@@ -21,6 +21,7 @@ def trocaStatus(codBotao):
 		status = False
 
 def iniciaThread():
+	global t1_stop
 	trocaStatus(1)
 	t1_stop = threading.Event()
 	t1 = threading.Thread(target = thread1, args = (1, t1_stop))
@@ -52,6 +53,7 @@ def thread1(arg1, eventoDeParada):
 			conn.send(out)
 
 def parar():
+	global t1_stop
 	t1_stop.set()
 	trocaStatus(2)
 

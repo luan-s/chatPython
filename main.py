@@ -3,7 +3,7 @@ import socket
 import sala
 
 KEYCONTROLLER = 'KEYCONTROLLER'
-TCP_IP = '192.168.56.1'
+TCP_IP = socket.gethostbyname(socket.gethostname())
 TCP_PORT = 8000
 BUFFER_SIZE = 2048
 
