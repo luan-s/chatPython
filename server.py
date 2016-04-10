@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-#encoding: utf-8
-=======
-# coding: utf-8
 
->>>>>>> 0501b425fd070e6f61049e4bd3e50ed8cedbde0e
+#encoding: utf-8
 import socket
 import sala
 import threading
