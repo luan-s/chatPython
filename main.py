@@ -9,8 +9,15 @@ BUFFER_SIZE = 2048
 
 def goServidor():
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect((TCP_IP, TCP_PORT))
+	sair = False
+	while not sair:
+		try:
+			s.connect((TCP_IP, TCP_PORT))
+			sair = True
+		except :
+			sair = False
 	return s
+
 
 def criaSala():
 	nome = raw_input("Nome da sala:")
@@ -37,18 +44,17 @@ def envia():
 	s.send(MESSAGE)
 	data = s.recv(BUFFER_SIZE)
 	print "Salas:"
-	print data.split('\n')
+	print data
 	sala = raw_input("Escolha uma sala: ")
 
 	sala = separaNomeSala(data.split('\n'),sala)
-
-
+	
 	while True:
 		msg = raw_input("Messsagem: ")
-		MESSAGE = "EM"+KEYCONTROLLER+nome+KEYCONTROLLER+sala+KEYCONTROLLER+msg
 		s = goServidor()
+		MESSAGE = "EM"+KEYCONTROLLER+nome+KEYCONTROLLER+sala+KEYCONTROLLER+msg
 		s.send(MESSAGE)
-	s.close()
+		s.close()
 #Envia()
 
 
