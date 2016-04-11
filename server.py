@@ -27,6 +27,9 @@ def iniciaThread():
 #iniciaThread()
 
 def thread1(arg1, eventoDeParada):
+	global numeroSalasLabel
+	global numeroSalas
+	
 	ipLabel['text'] = TCP_IP
 	portaLabel['text'] = TCP_PORT
 	while not eventoDeParada.is_set():
@@ -38,6 +41,8 @@ def thread1(arg1, eventoDeParada):
 		data = conn.recv(BUFFER_SIZE)
 
 		if(data[:2] == 'CS'): #Cria Sala
+			numeroSalas += 1
+			numeroSalasLabel['text'] = numeroSalas
 			aux = data.split('KEYCONTROLLER')
 			user = usuario.usuario(aux[1],addr[0],conn)
 			salas.adicionaConexao(user,aux[2],addr[0])
@@ -110,6 +115,7 @@ def parar():
 #parar()
 
 status = False
+numeroSalas = 0
 TCP_IP = socket.gethostbyname(socket.gethostname())
 TCP_PORT = 8000
 t1_stop = threading.Event()
@@ -123,7 +129,7 @@ s.bind((TCP_IP, TCP_PORT))
 # Início da GUI ------------------------------------------------------------
 
 root = Tk();
-root.geometry('180x270')
+root.geometry('180x290')
 container = Frame(root)
 container.pack()
 
@@ -153,6 +159,12 @@ PL.grid(row = 2, column = 0)
 
 portaLabel = Label(container2)
 portaLabel.grid(row = 2, column = 1)
+
+NSL = Label(container2, text = 'Salas: ')
+NSL.grid(row = 3, column = 0)
+
+numeroSalasLabel = Label(container2, text = '0')
+numeroSalasLabel.grid(row = 3, column = 1)
 
 # Fim da GUI --------------------------------------------------------------------------
 
