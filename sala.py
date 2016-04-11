@@ -41,9 +41,7 @@ class sala:
 		
 		return nomes				
 
-
-
-	def isAdmin(seld, ip, nomeSala):
+	def isAdmin(self, ip, nomeSala):
 		if self.s[nomeSala][1] == ip:
 			return True
 		return False

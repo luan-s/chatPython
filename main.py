@@ -20,8 +20,30 @@ def goServidor():
 
 
 def criaSala():
+
+	
+
+
 	nome = raw_input("Seu nome:")
 	nomeSala = raw_input("Nome da sala:")
+
+	MESSAGE = "LS"
+	s = goServidor()
+	s.send(MESSAGE)
+	data = s.recv(BUFFER_SIZE)
+	s.close()
+
+	if(data!=""):
+		print 'data: '+data
+		salas = data.split('\n')
+
+		for i in range(len(salas)):
+			salas[i] = salas[i][2:]
+		if nomeSala in salas:
+			op = int(raw_input("A sala ja existe, deseja entrar nela ?\n1-Sim\n2-Nao"))
+			if(op==2): return
+
+
 	MESSAGE = "CS"+KEYCONTROLLER+nome+KEYCONTROLLER+nomeSala
 	s = goServidor()
 	s.send(MESSAGE)
@@ -32,6 +54,7 @@ def criaSala():
 
 def separaNomeSala(lista, op):
 	for i in lista:
+		input()
 		if(op in i):
 			return i[2:]
 
@@ -66,7 +89,7 @@ def envia():
 def main():
 	while True:
 		print "1-Criar Sala"
-		print "2-Entrar em uma sala"
+		print "2-Enviar texto para uma sala"
 		op = int(raw_input("Opcao:"))
 
 		if op==1 :
