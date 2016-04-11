@@ -1,9 +1,6 @@
 
 #encoding: utf-8
-import socket
-import sala
-import threading
-import time
+import socket, sala, threading, time, usuario
 from Tkinter import *
 
 def trocaStatus(codBotao):
@@ -11,14 +8,15 @@ def trocaStatus(codBotao):
 	global statusLabel
 
 	print codBotao
-	if status == False and codBotao == 1:
+	if not status  and codBotao == 1:
 		statusLabel['text'] = 'rodando'
 		statusLabel['fg'] = '#0C0'
 		status = True
-	elif status == True and codBotao == 2:
+	elif status and codBotao == 2:
 		statusLabel['text'] = 'parado'
 		statusLabel['fg'] = '#C00'
 		status = False
+#trocaStatus()
 
 def iniciaThread():
 	global t1_stop
@@ -26,6 +24,7 @@ def iniciaThread():
 	t1_stop = threading.Event()
 	t1 = threading.Thread(target = thread1, args = (1, t1_stop))
 	t1.start()
+#iniciaThread()
 
 def thread1(arg1, eventoDeParada):
 	ipLabel['text'] = TCP_IP
@@ -39,11 +38,19 @@ def thread1(arg1, eventoDeParada):
 		data = conn.recv(BUFFER_SIZE)
 
 		if(data[:2] == 'CS'): #Cria Sala
-			salas.adicionaConexao(conn,data[2:],addr[0])
+			aux = data.split('KEYCONTROLLER')
+			user = usuario.usuario(aux[1],addr[0],conn)
+			salas.adicionaConexao(user,aux[2],addr[0])
 
 		if(data[:2] == 'EM'): #Envia Msg
 			msg = data.split('KEYCONTROLLER')
-			salas.enviaMsg(msg[2], msg[3], msg[1])
+			comando = verificaComando(msg[3])
+
+			if comando != None:
+				executaComando(comando,conn,addr[0])
+			else: 
+				salas.enviaMsg(msg[2], msg[3], msg[1])
+			conn.send('ok')
 
 		if(data[:2] == 'LS'): #Lista de Salas
 			lista = salas.listaSalas()
@@ -51,11 +58,59 @@ def thread1(arg1, eventoDeParada):
 			for i in range(len(lista)):
 				out = out + str(i+1)+'-'+lista[i]+'\n'
 			conn.send(out)
+#thread1()
+
+def verificaComando(msg):
+	comando = ''
+	if msg == '': return None
+	if msg[0]=='/':
+		for i in msg:
+			if i == ' ': break
+			comando = comando + i;
+		comando = comando[1:]
+		if(comando=="listar"): return comando
+		if(comando=="sair"): return comando
+		if(comando=="ajuda"): return comando
+		if(comando=="remover"): return comando
+	return None
+#VerificaComando()
+
+def executaComando(comando, conn, ip):
+	if(comando=="listar"): listar(ip,conn)
+	if(comando=="sair"): sair(conn)
+	if(comando=="ajuda"): ajuda()
+	if(comando=="remover"): revome()
+#ececutaComando()
+
+def listar(ip,conn):
+	aux = ''
+	lista = salas.listaUsuarios(ip)
+	for i in lista:
+		aux = aux + i + '\n'
+	aux = 'LUSER-'+aux
+	conn.send(aux)
+
+
+#listar()
+
+def sair(conn):
+	conn.send("sair")
+#sair()
+
+def ajuda():
+	pass
+#ajuda()
+
+def remove():
+	pass
+#remove()
+
 
 def parar():
 	global t1_stop
 	t1_stop.set()
 	trocaStatus(2)
+#parar()
 
 status = False
 TCP_IP = socket.gethostbyname(socket.gethostname())
