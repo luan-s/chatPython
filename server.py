@@ -78,7 +78,7 @@ def verificaComando(msg):
 def executaComando(comando, conn, ip):
 	if(comando=="listar"): listar(ip,conn)
 	if(comando=="sair"): sair(conn)
-	if(comando=="ajuda"): ajuda()
+	if(comando=="ajuda"): ajuda(conn)
 	if(comando=="remover"): revome()
 #ececutaComando()
 
@@ -89,22 +89,19 @@ def listar(ip,conn):
 		aux = aux + i + '\n'
 	aux = 'LUSER-'+aux
 	conn.send(aux)
-
-
 #listar()
 
 def sair(conn):
 	conn.send("sair")
 #sair()
 
-def ajuda():
-	pass
+def ajuda(conn):
+	conn.send("textoAjuda")
 #ajuda()
 
 def remove():
 	pass
 #remove()
-
 
 def parar():
 	global t1_stop
@@ -124,6 +121,7 @@ s.bind((TCP_IP, TCP_PORT))
 
 
 # Início da GUI ------------------------------------------------------------
+
 root = Tk();
 root.geometry('180x270')
 container = Frame(root)

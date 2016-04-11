@@ -1,3 +1,4 @@
+#encoding: utf-8
 import sala
 import socket
 import sala
@@ -50,15 +51,20 @@ def envia():
 	sala = separaNomeSala(data.split('\n'),sala)
 	
 	while True:
-		msg = raw_input("Messsagem: ")
+		msg = raw_input("Mensagem: ")
 		s = goServidor()
 		MESSAGE = "EM"+KEYCONTROLLER+nome+KEYCONTROLLER+sala+KEYCONTROLLER+msg
 		s.send(MESSAGE)
 		data  = s.recv(BUFFER_SIZE)
+		
 		if data == 'sair' : break
+
+		if data == 'textoAjuda': print textoAjuda
+
 		if(data[0]=='L' and data[1]=='U'):
 			data = data.split("LUSER-")
 			print(data[1])
+
 		s.close()
 #Envia()
 
@@ -74,4 +80,11 @@ def main():
 		if op==2 :
 			envia()
 #Main()
+
+textoAjuda = '''\nComandos:\n
+	\n    /listar -> lista os usuários presentes na sala
+	\n    /remover -> remove um usuário da sala. Só pode ser usado pelo admin
+	\n    /sair -> sai da sala atual'
+	\n    /ajuda -> mostra o menu de ajuda\n\n'''
+
 main()
