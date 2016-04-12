@@ -1,8 +1,8 @@
-
 #encoding: utf-8
 import socket, sala, threading, time, usuario
 from Tkinter import *
 
+KEYCONTROLLER = '<ctrl>'
 def trocaStatus(codBotao):
 	global status
 	global statusLabel
@@ -36,19 +36,20 @@ def thread1(arg1, eventoDeParada):
 		#print 'Thread 1 rodando \n'
 		s.listen(1)
 		conn, addr = s.accept()
-		print 'Connection address:', addr
 
 		data = conn.recv(BUFFER_SIZE)
 
 		if(data[:2] == 'CS'): #Cria Sala
-			numeroSalas += 1
-			numeroSalasLabel['text'] = numeroSalas
-			aux = data.split('KEYCONTROLLER')
+			
+
+			aux = data.split(KEYCONTROLLER)
 			user = usuario.usuario(aux[1],addr[0],conn)
-			salas.adicionaConexao(user,aux[2],addr[0])
+			if not salas.criaSala(user,aux[2],addr[0]):
+				msg = KEYCONTROLLER+'salaInvalida'+KEYCONTROLLER
+				conn.send(msg)
 
 		if(data[:2] == 'EM'): #Envia Msg
-			msg = data.split('KEYCONTROLLER')
+			msg = data.split(KEYCONTROLLER)
 			comando = verificaComando(msg[3])
 
 			if comando != None:
@@ -63,6 +64,14 @@ def thread1(arg1, eventoDeParada):
 			for i in range(len(lista)):
 				out = out + str(i+1)+'-'+lista[i]+'\n'
 			conn.send(out)
+
+		if(data[:2] == 'ES'): #Entrar em Sala
+			aux = data.split(KEYCONTROLLER)
+			user = usuario.usuario(aux[1],addr[0],conn)
+			salas.adicionaUsuario(user,aux[2])
+
+
+		atualizaNSalas()
 #thread1()
 
 def verificaComando(msg):
@@ -97,11 +106,11 @@ def listar(ip,conn):
 #listar()
 
 def sair(conn):
-	conn.send("sair")
+	conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
 #sair()
 
 def ajuda(conn):
-	conn.send("textoAjuda")
+	conn.send(KEYCONTROLLER+"textoAjuda"+KEYCONTROLLER)
 #ajuda()
 
 def remove():
@@ -113,6 +122,10 @@ def parar():
 	t1_stop.set()
 	trocaStatus(2)
 #parar()
+
+def atualizaNSalas():
+	numeroSalasLabel['text'] = salas.getNumSalas()
+
 
 status = False
 numeroSalas = 0

@@ -4,13 +4,17 @@ class sala:
 		self.id = ID
 		self.s = {}
 		
-	def adicionaConexao(self, user, nome, ip):
+	def criaSala(self, user, nome, ip):
 		if not nome in self.s:
 			aux = ([user],ip)
 			self.s[nome] = aux
-		else:
+			print 'Sala Criada: ',self.s
+			return True
+		return False
+
+	def adicionaUsuario(self, user, nome):
 			self.s[nome][0].append(user)
-		print 'conectou',self.s
+			print 'Entrou na sala: ',self.s
 
 	def enviaMsg(self, nomeSala, msg, nome):
 		msg = nome+': '+msg
@@ -24,6 +28,7 @@ class sala:
 
 	def listaSalas(self):
 		nomes = []
+		print "Aqui: ",self.s
 		for i in self.s:
 			nomes.append(i)
 		return list(set(nomes))
@@ -45,3 +50,6 @@ class sala:
 		if self.s[nomeSala][1] == ip:
 			return True
 		return False
+
+	def getNumSalas(self):
+		return len(self.s)
