@@ -40,8 +40,6 @@ def thread1(arg1, eventoDeParada):
 		data = conn.recv(BUFFER_SIZE)
 
 		if(data[:2] == 'CS'): #Cria Sala
-			
-
 			aux = data.split(KEYCONTROLLER)
 			user = usuario.usuario(aux[1],addr[0],conn)
 			if not salas.criaSala(user,aux[2],addr[0]):
@@ -70,6 +68,8 @@ def thread1(arg1, eventoDeParada):
 			user = usuario.usuario(aux[1],addr[0],conn)
 			salas.adicionaUsuario(user,aux[2])
 
+		if(data[:2] == 'NS'): #Numero de Salas
+			conn.send(str(salas.getNumSalas()))
 
 		atualizaNSalas()
 #thread1()
@@ -143,6 +143,7 @@ s.bind((TCP_IP, TCP_PORT))
 
 root = Tk();
 root.geometry('180x290')
+root.wm_title('Servidor')
 container = Frame(root)
 container.pack()
 
@@ -155,6 +156,7 @@ btnStop.pack()
 
 container2 = Frame()
 container2.pack(pady = 30)
+
 LS = Label(container2, text = 'Status: ')
 LS.grid(row = 0, column = 0)
 
