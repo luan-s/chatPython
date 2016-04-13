@@ -98,7 +98,7 @@ def getSalas():
 	s.send(MESSAGE)
 	data = s.recv(BUFFER_SIZE)
 
-	return ('KAPPA\nROSS\nMAMAE')
+	return data
 #GetSalas()
 
 def getNumeroSalas():
