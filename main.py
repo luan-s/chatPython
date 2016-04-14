@@ -1,11 +1,7 @@
 #encoding: utf-8
 import sala, socket, ttk
 from Tkinter import *
-
-KEYCONTROLLER = '<ctrl>'
-TCP_IP = socket.gethostbyname(socket.gethostname())
-TCP_PORT = 8000
-BUFFER_SIZE = 2048
+import tkMessageBox
 
 def goServidor():
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -105,6 +101,7 @@ def getNumeroSalas():
 	MESSAGE = "NS"
 	s = goServidor()
 	s.send(MESSAGE)
+	s.settimeout(1)
 	data = s.recv(BUFFER_SIZE)
 
 	return int(data)
@@ -125,7 +122,7 @@ def criarSalaSelected():
 	salasComboBox['state'] = DISABLED
 	
 	btnOk['text'] = 'Criar'
-	btnOk.grid(row = 6, column = 1)
+	btnOk.grid(row = 6, column = 0)
 	op = 1
 #criarSalasSelected()
 
@@ -142,13 +139,49 @@ def entrarSalaSelected():
 		salasComboBox['values'] = getSalas().split('\n')
 
 	btnOk['text'] = 'Entrar'
-	btnOk.grid(row = 6, column = 1)
+	btnOk.grid(row = 6, column = 0)
 	op = 2
 #entrarSalaSelected()
 
+def setIp():
+	global TCP_IP
+	global root1
+
+	TCP_IP = ipServidorCampo.get()
+	print TCP_IP
+	root1.destroy()
+#setIp()
+
 def okPressed():
-	print op
+	
+	print TCP_IP
 #okPressed()
+
+def obtemIpServidor():
+	global root1
+	global ipServidorCampo
+
+	root1 = Tk()
+	root1.geometry('360x60')
+	root1.wm_title('Chat')
+
+	container0 = Frame(root1)
+	container0.pack(padx = 10, pady = 13)
+
+	ipServidorLabel = Label(container0, text = 'IP Servidor:       ')
+	ipServidorLabel.grid(row = 0, column = 0)
+
+	ipServidorCampo = Entry(container0)
+	ipServidorCampo.grid(row = 0, column = 1)
+
+	labelEspacadora = Label(container0, text = '   ')
+	labelEspacadora.grid(row = 0, column = 2)
+
+	dialogOk = Button(container0, text = 'OK', command = setIp)
+	dialogOk.grid(row = 0, column = 3)
+	
+	root1.mainloop()
+#obtemIpServidor()
 
 def main():
 	global nomeSalaCampo
@@ -157,8 +190,10 @@ def main():
 	global salasComboBox
 	global btnOk
 
+	obtemIpServidor()
+
 	root = Tk()
-	root.geometry('350x250')
+	root.geometry('370x250')
 	root.wm_title('Menu')
 
 	container = Frame(root)
@@ -197,14 +232,14 @@ def main():
 	nomeUsuarioCampo2 = Entry(container4, state = DISABLED)
 	nomeUsuarioCampo2.grid(row = 4, column = 1)
 
-	listaSalasLabel = Label(container4, text = 'Sala:                 ')
+	listaSalasLabel = Label(container4, text = 'Sala:                ')
 	listaSalasLabel.grid(row = 5, column = 0)
 
-	salasComboBox = ttk.Combobox(container4, width = 17, state = DISABLED)
+	salasComboBox = ttk.Combobox(container4, width = 18, state = DISABLED)
 	salasComboBox.grid(row = 5, column = 1)
 
 	container5 = Frame(root)
-	container5.pack(pady = 25)
+	container5.pack(pady = 25, padx = 30)
 
 	btnOk = Button(container5, width = 15,  command = okPressed)
 
@@ -231,9 +266,16 @@ nomeSalaCampo = Entry
 nomeUsuarioCampo1 = Entry
 nomeUsuarioCampo2 = Entry
 salasComboBox = ttk.Combobox
+ipServidorCampo = Entry
+root1 = Tk
+TCP_IP = ''
 btnOk = Button
 op = 0
 # Fim variáveis globais
+
+KEYCONTROLLER = '<ctrl>'
+TCP_PORT = 8000
+BUFFER_SIZE = 2048
 
 main()
 
