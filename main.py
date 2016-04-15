@@ -38,7 +38,7 @@ def igBatePapo():
 	container1 = Frame(root2)
 	container1.pack(padx = 10)
 
-	inputTexto = Entry(container1, width = 43,)
+	inputTexto = Entry(container1, width = 43)
 	inputTexto.grid(row = 1, column = 0)
 
 	labelEspacadora = Label(container1, text = '   ')
@@ -53,30 +53,48 @@ def igBatePapo():
 def enviarMensagem():
 	global inputTexto
 	global textoSala
-
 	global nomeString
 	global nomeSalaString
 
 	msg = inputTexto.get()
-
+	
 	s = goServidor()
 	MESSAGE = "EM"+KEYCONTROLLER+nomeString+KEYCONTROLLER+nomeSalaString+KEYCONTROLLER+msg
 	s.send(MESSAGE)
 	data = s.recv(BUFFER_SIZE)
 	
-	if data == KEYCONTROLLER+'sair'+KEYCONTROLLER : 
-		textoSala.insert(END, 'Você saiu.')
-		#sair
+	if (data != 'ok'):
+		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER : 
+			textoSala.insert(END, 'Você saiu.')
+			#sair
 
-	if data == KEYCONTROLLER+'textoAjuda'+KEYCONTROLLER: 
-		textoSala.insert(END, textoAjuda + '\n')
+		if data == KEYCONTROLLER+'textoAjuda'+KEYCONTROLLER: 
+			textoSala.insert(END, textoAjuda + '\n')
 
-	if(data[0]=='L' and data[1]=='U'):
-		data = data.split("LUSER-")
-		textoSala.insert(END, data[1] + '\n')
+		if(data[0]=='L' and data[1]=='U'):
+			data = data.split("LUSER-")
+			textoSala.insert(END, data[1] + '\n')
 
 	s.close()
 #enviarMensagem()
+
+def entrarSala():
+	global nomeString
+	global nomeSalaString
+	global root
+
+	MESSAGE = "ES"+KEYCONTROLLER+nomeString+KEYCONTROLLER+nomeSalaString
+	s = goServidor()
+	s.send(MESSAGE)
+
+	# Esta thread cuida de atualizar o campo onde as mensagens da sala aparecem
+	t1 = threading.Thread(target = threadCaixaMensagens, args = (1, s))
+	t1.start()
+
+	# Cria a janela do bate papo
+	igBatePapo()
+
+#entrarSala()
 
 #Exibe uma caixa de diálogo genérica, configurada pelos parâmetros
 def exibirMensagem(mensagem, titulo):
@@ -133,29 +151,6 @@ def separaNomeSala(lista, op):
 			return i[2:]
 #separaNomeSala():
 
-def entrar():
-	nome = raw_input("Seu nome:")
-
-	data = getSalas()
-	print data
-	sala = raw_input("Escolha uma sala: ")
-	sala = separaNomeSala(data.split('\n'),sala)
-
-	MESSAGE = "ES"+KEYCONTROLLER+nome+KEYCONTROLLER+sala
-	s = goServidor()
-	s.send(MESSAGE)
-	while True:
-		data = s.recv(BUFFER_SIZE)
-
-		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: break
-		if data == KEYCONTROLLER+'salaInvalida'+KEYCONTROLLER: 
-			print "Ja existe uma sala com esse nome!\n"
-			break
-
-		print data
-	
-#Envia()
-
 def getSalas():
 	MESSAGE = "LS"
 	s = goServidor()
@@ -211,7 +206,7 @@ def entrarSalaSelected():
 	op = 2
 #entrarSalaSelected()
 
-def setIp():
+def setIp(event):
 	global TCP_IP
 	global root1
 
@@ -240,7 +235,10 @@ def obtemIpServidor():
 	labelEspacadora = Label(container0, text = '   ')
 	labelEspacadora.grid(row = 0, column = 2)
 
-	dialogOk = Button(container0, text = 'OK', command = setIp)
+	#dialogOk = Button(container0, text = 'OK', command = setIp)
+	dialogOk = Button(container0, text = 'OK')
+	root1.bind('<Return>', setIp)
+
 	dialogOk.grid(row = 0, column = 3)
 	
 	root1.mainloop()
@@ -259,11 +257,17 @@ def okPressed():
 		criaSala()
 	else:
 		nomeString = nomeUsuarioCampo2.get()
-
+		root.withdraw()
+		entrarSala()
 
 	print TCP_IP
 #okPressed()
 
+def salaSelecionada(event):
+	global nomeSalaString
+	nomeSalaString = salasComboBox.get()[2:]
+	print nomeSalaString
+#salaSelecionada()
 
 def main():
 	global nomeSalaCampo
@@ -319,29 +323,14 @@ def main():
 	listaSalasLabel.grid(row = 5, column = 0)
 
 	salasComboBox = ttk.Combobox(container4, width = 18, state = DISABLED)
+	salasComboBox.bind("<<ComboboxSelected>>", salaSelecionada)
 	salasComboBox.grid(row = 5, column = 1)
 
 	container5 = Frame(root)
 	container5.pack(pady = 25, padx = 30)
 
 	btnOk = Button(container5, width = 15,  command = okPressed)
-
-	
-
-	'''while True:
-		print "1-Criar Sala"
-		print "2-Enviar texto para uma sala"
-		print "3-Entrar em uma sala"
-		op = int(raw_input("Opcao:"))
-
-		if op==1 :
-			criaSala()
-		if op==2 :
-			envia()
-		if op==3 :
-			entrar()'''
 	mainloop()
-	
 #Main()
 
 # Declarando variáveis globais

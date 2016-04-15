@@ -95,7 +95,7 @@ def executaComando(comando, conn, ip):
 	if(comando=="listar"): listar(ip,conn)
 	if(comando=="sair"): sair(conn)
 	if(comando=="ajuda"): ajuda(conn)
-	if(comando=="remover"): revome()
+	if(comando=="remover"): remove()
 #ececutaComando()
 
 def listar(ip,conn):
@@ -127,7 +127,7 @@ def parar():
 
 def atualizaNSalas():
 	numeroSalasLabel['text'] = salas.getNumSalas()
-
+#atualizaNSalas()
 
 status = False
 numeroSalas = 0
