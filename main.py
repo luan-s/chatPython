@@ -196,7 +196,6 @@ def separaNomeSala(lista, op):
 			return i[2:]
 #separaNomeSala():
 
-<<<<<<< HEAD
 def entrar():
 	'''
 		Abre uma conexão com o servidor, envia a mensagem ES (entrar na sala) para ele e 
@@ -224,8 +223,6 @@ def entrar():
 	
 #Envia()
 
-=======
->>>>>>> 28dab14ae1bc04a9b0deafe3defd7b5d750eef02
 def getSalas():
 	'''
 		Recebe do servidor os nomes numerados de todas as salas já criadas.
