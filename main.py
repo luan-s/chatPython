@@ -3,7 +3,6 @@ import sala, socket, ttk, threading
 from Tkinter import *
 import tkMessageBox
 
-
 def goServidor():
 	'''
 		Abre uma conexão com o servidor,
@@ -21,8 +20,6 @@ def goServidor():
 	return s
 #GoServidor()
 
-
-
 def igBatePapo():
 	'''
 		Interface grafica da janeja "bate papo", onde é possivel enviar e
@@ -32,13 +29,8 @@ def igBatePapo():
 	global textoSala
 	global inputTexto
 
-
 	root2 = Tk()
-
-	#Define as dimensões da janela
 	root2.geometry('380x305')
-
-	#define o titulo da janela
 	root2.wm_title('Sala')
 
 	container0 = Frame(root2)
@@ -67,8 +59,6 @@ def igBatePapo():
 	root2.mainloop()
 #igBatePapo()
 
-
-
 def enviarMensagem():
 	'''
 		Abre uma conexão com o servidor, envia a mensagem EM (enviar mensage) para ele,
@@ -88,24 +78,27 @@ def enviarMensagem():
 	s.send(MESSAGE)
 	data = s.recv(BUFFER_SIZE)
 	
-	if (data != 'ok'):
+	if (len(data) >= 2):
 		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER : 
 			textoSala.insert(END, 'Você saiu.')
 			#sair
 
-	if data == KEYCONTROLLER+'textoAjuda'+KEYCONTROLLER: 
-		textoSala.insert(END, textoAjuda + '\n')
-		#ajuda
+		if data == KEYCONTROLLER+'textoAjuda'+KEYCONTROLLER: 
+			textoSala.insert(END, textoAjuda + '\n')
 
-	if(data[0]=='L' and data[1]=='U'):
-		data = data.split("LUSER-")
-		textoSala.insert(END, data[1] + '\n')
-		#Listar usuario
+		if(data[0]=='L' and data[1]=='U'):
+			data = data.split("LUSER-")
+			textoSala.insert(END, data[1] + '\n')
 
 	s.close()
 #enviarMensagem()
 
 def entrarSala():
+	'''
+		Abre uma conexão com o servidor, envia a mensagem ES (entrar na sala) para ele e 
+		recebe uma confirmação do servidor, em seguida fica esperando mensagens do servidor
+	    através de thread.
+	'''
 	global nomeString
 	global nomeSalaString
 	global root
@@ -140,8 +133,6 @@ def exibirMensagem(mensagem, titulo):
 	root.mainloop()
 #exibirMensagem()
 
-
-
 def criaSala():
 	'''
 		Abre uma conexão com o servidor, envia a mensagem CS (criar sala) para ele,
@@ -171,7 +162,6 @@ def criaSala():
 	
 # criaSala()
 
-
 def threadCaixaMensagens(arg1, s):
 	'''
 		Função que escuta as mensagens digitadas pelo usuario
@@ -185,43 +175,6 @@ def threadCaixaMensagens(arg1, s):
 
 		textoSala.insert(END, data + '\n')
 #threadCaixaMensagens()
-
-def separaNomeSala(lista, op):
-	'''
-		Recebe uma string com o os nomes das salas numeradas,
-		e retorna os nomes das salas separadas '\n'
-	'''
-	for i in lista:
-		if(op in i):
-			return i[2:]
-#separaNomeSala():
-
-def entrar():
-	'''
-		Abre uma conexão com o servidor, envia a mensagem ES (entrar na sala) para ele e 
-		recebe uma confirmação do servidor, em seguida fica esperando mensagens do servidor 
-	'''
-	nome = raw_input("Seu nome:")
-
-	data = getSalas()
-	print data
-	sala = raw_input("Escolha uma sala: ")
-	sala = separaNomeSala(data.split('\n'),sala)
-
-	MESSAGE = "ES"+KEYCONTROLLER+nome+KEYCONTROLLER+sala
-	s = goServidor()
-	s.send(MESSAGE)
-	while True:
-		data = s.recv(BUFFER_SIZE)
-
-		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: break
-		if data == KEYCONTROLLER+'salaInvalida'+KEYCONTROLLER: 
-			print "Ja existe uma sala com esse nome!\n"
-			break
-
-		print data
-	
-#Envia()
 
 def getSalas():
 	'''
@@ -255,13 +208,11 @@ textoAjuda = '''\nComandos:\n
 	\n    /ajuda -> mostra o menu de ajuda\n\n'''
 #textoAjuda
 
-
 def criarSalaSelected():
 	'''
 		Verificar se a checkBox "criaSala" esta selecionada, 
 		caso esteja desabilida as opções do "EntrarSala"	
 	'''
-
 	global op
 	nomeSalaCampo['state'] = NORMAL
 	nomeUsuarioCampo1['state'] = NORMAL
@@ -294,7 +245,7 @@ def entrarSalaSelected():
 	op = 2
 #entrarSalaSelected()
 
-def setIp():
+def setIp(event):
 	'''
 		"Seta" o ip digitado na variavel de controle do servidor
 	'''
@@ -339,11 +290,11 @@ def obtemIpServidor():
 	root1.mainloop()
 #obtemIpServidor()
 
-
-
 def okPressed():
 	'''
-		Chama função quando o botão ok é precionado
+		Função chamada quando o botão ok é pressionado. Identifica qual radio button foi 
+		selecionado no menu e direciona a linha de execução do programa para a funcionalidade
+		escolhida.
 	'''
 	global nomeString
 	global nomeSalaString
@@ -364,9 +315,12 @@ def okPressed():
 #okPressed()
 
 def salaSelecionada(event):
+	'''
+		Função chamada quando uma sala é selecionada no ComboBox. "Seta" o nome da sala
+		na variável global correspondente.
+	'''
 	global nomeSalaString
 	nomeSalaString = salasComboBox.get()[2:]
-	print nomeSalaString
 #salaSelecionada()
 
 def main():
