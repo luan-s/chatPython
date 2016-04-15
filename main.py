@@ -3,7 +3,13 @@ import sala, socket, ttk, threading
 from Tkinter import *
 import tkMessageBox
 
+
 def goServidor():
+	'''
+		Abre uma conexão com o servidor,
+		caso a de erro na conexão, é feita uma nova tentativa
+		retorna o objeto Socket
+	'''
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	sair = False
 	while not sair:
@@ -15,13 +21,24 @@ def goServidor():
 	return s
 #GoServidor()
 
+
+
 def igBatePapo():
+	'''
+		Interface grafica da janeja "bate papo", onde é possivel enviar e
+		receber menssagens.
+	'''
 	global root2
 	global textoSala
 	global inputTexto
 
+
 	root2 = Tk()
+
+	#Define as dimensões da janela
 	root2.geometry('380x305')
+
+	#define o titulo da janela
 	root2.wm_title('Sala')
 
 	container0 = Frame(root2)
@@ -50,7 +67,15 @@ def igBatePapo():
 	root2.mainloop()
 #igBatePapo()
 
+
+
 def enviarMensagem():
+	'''
+		Abre uma conexão com o servidor, envia a mensagem EM (enviar mensage) para ele,
+		em seguida recebe uma confirmação do servidor, caso a mensagem de confirmação for
+		alguma palavra de controle (sair, ajuda, listar ou romover) é a execução é encaminhada
+		para uma funcção especifica.
+	'''
 	global inputTexto
 	global textoSala
 
@@ -70,16 +95,21 @@ def enviarMensagem():
 
 	if data == KEYCONTROLLER+'textoAjuda'+KEYCONTROLLER: 
 		textoSala.insert(END, textoAjuda + '\n')
+		#ajuda
 
 	if(data[0]=='L' and data[1]=='U'):
 		data = data.split("LUSER-")
 		textoSala.insert(END, data[1] + '\n')
+		#Listar usuario
 
 	s.close()
 #enviarMensagem()
 
-#Exibe uma caixa de diálogo genérica, configurada pelos parâmetros
+
 def exibirMensagem(mensagem, titulo):
+	'''
+		Exibe uma caixa de diálogo genérica, configurada pelos parâmetros
+	'''
 	root = Tk()
 	root.geometry('170x60')
 	root.wm_title(titulo)
@@ -93,7 +123,15 @@ def exibirMensagem(mensagem, titulo):
 	root.mainloop()
 #exibirMensagem()
 
+
+
 def criaSala():
+	'''
+		Abre uma conexão com o servidor, envia a mensagem CS (criar sala) para ele,
+		em seguida recebe uma confirmação do servidor, caso a mensagem de confirmação for
+		sala invalida (salaInvalida) é porque a sala já existe. 
+		para uma funcção especifica. 
+	'''
 	global nomeString
 	global nomeSalaString
 	global root
@@ -116,7 +154,11 @@ def criaSala():
 	
 # criaSala()
 
+
 def threadCaixaMensagens(arg1, s):
+	'''
+		Função que escuta as mensagens digitadas pelo usuario
+	'''
 	global textoSala
 	while True:
 		data = s.recv(BUFFER_SIZE)
@@ -128,12 +170,20 @@ def threadCaixaMensagens(arg1, s):
 #threadCaixaMensagens()
 
 def separaNomeSala(lista, op):
+	'''
+		Recebe uma string com o os nomes das salas numeradas,
+		e retorna os nomes das salas separadas '\n'
+	'''
 	for i in lista:
 		if(op in i):
 			return i[2:]
 #separaNomeSala():
 
 def entrar():
+	'''
+		Abre uma conexão com o servidor, envia a mensagem ES (entrar na sala) para ele e 
+		recebe uma confirmação do servidor, em seguida fica esperando mensagens do servidor 
+	'''
 	nome = raw_input("Seu nome:")
 
 	data = getSalas()
@@ -157,6 +207,9 @@ def entrar():
 #Envia()
 
 def getSalas():
+	'''
+		Recebe do servidor os nomes numerados de todas as salas já criadas.
+	'''
 	MESSAGE = "LS"
 	s = goServidor()
 	s.send(MESSAGE)
@@ -166,6 +219,9 @@ def getSalas():
 #GetSalas()
 
 def getNumeroSalas():
+	'''
+		Abre uma conexão para o servidor, e recebe o numero de salas existentes
+	'''
 	MESSAGE = "NS"
 	s = goServidor()
 	s.send(MESSAGE)
@@ -182,7 +238,13 @@ textoAjuda = '''\nComandos:\n
 	\n    /ajuda -> mostra o menu de ajuda\n\n'''
 #textoAjuda
 
+
 def criarSalaSelected():
+	'''
+		Verificar se a checkBox "criaSala" esta selecionada, 
+		caso esteja desabilida as opções do "EntrarSala"	
+	'''
+
 	global op
 	nomeSalaCampo['state'] = NORMAL
 	nomeUsuarioCampo1['state'] = NORMAL
@@ -195,6 +257,10 @@ def criarSalaSelected():
 #criarSalasSelected()
 
 def entrarSalaSelected():
+	'''
+		Verificar se a checkBox "EntrarSala" esta selecionada, 
+		caso esteja desabilida as opções do "criarSala"	
+	'''
 	global op
 	global listasComboBox
 	nomeSalaCampo['state'] = DISABLED
@@ -212,6 +278,9 @@ def entrarSalaSelected():
 #entrarSalaSelected()
 
 def setIp():
+	'''
+		"Seta" o ip digitado na variavel de controle do servidor
+	'''
 	global TCP_IP
 	global root1
 
@@ -221,6 +290,10 @@ def setIp():
 #setIp()
 
 def obtemIpServidor():
+	'''
+		Exibe uma caixa de texto perguntando o ip do servidor
+		em seguida chama a função acima
+	'''
 	global root1
 	global ipServidorCampo
 
@@ -246,7 +319,12 @@ def obtemIpServidor():
 	root1.mainloop()
 #obtemIpServidor()
 
+
+
 def okPressed():
+	'''
+		Chama função quando o botão ok é precionado
+	'''
 	global nomeString
 	global nomeSalaString
 	global root

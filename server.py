@@ -3,6 +3,8 @@ import socket, sala, threading, time, usuario
 from Tkinter import *
 
 KEYCONTROLLER = '<ctrl>'
+
+
 def trocaStatus(codBotao):
 	global status
 	global statusLabel
