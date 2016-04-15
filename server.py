@@ -45,6 +45,8 @@ def thread1(arg1, eventoDeParada):
 			if not salas.criaSala(user,aux[2],addr[0]):
 				msg = KEYCONTROLLER+'salaInvalida'+KEYCONTROLLER
 				conn.send(msg)
+			else:
+				conn.send('ok')
 
 		if(data[:2] == 'EM'): #Envia Msg
 			msg = data.split(KEYCONTROLLER)

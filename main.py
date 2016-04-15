@@ -1,5 +1,5 @@
 #encoding: utf-8
-import sala, socket, ttk
+import sala, socket, ttk, threading
 from Tkinter import *
 import tkMessageBox
 
@@ -15,55 +15,123 @@ def goServidor():
 	return s
 #GoServidor()
 
-def criaSala():
-	nome = raw_input("Seu nome:")
-	nomeSala = raw_input("Nome da sala:")
+def igBatePapo():
+	global root2
+	global textoSala
+	global inputTexto
 
-	MESSAGE = "CS"+KEYCONTROLLER+nome+KEYCONTROLLER+nomeSala
+	root2 = Tk()
+	root2.geometry('380x305')
+	root2.wm_title('Sala')
+
+	container0 = Frame(root2)
+	container0.pack(padx = 10, pady = 10)
+
+	scrollbar = Scrollbar(container0)
+	scrollbar.pack(side=RIGHT, fill=Y)
+
+	textoSala = Text(container0, width = 44, height = 15, wrap = WORD, yscrollcommand = scrollbar.set)
+	textoSala.pack()
+
+	scrollbar.config(command = textoSala.yview)
+
+	container1 = Frame(root2)
+	container1.pack(padx = 10)
+
+	inputTexto = Entry(container1, width = 43,)
+	inputTexto.grid(row = 1, column = 0)
+
+	labelEspacadora = Label(container1, text = '   ')
+	labelEspacadora.grid(row = 1, column = 1)
+
+	enviarMsgButton = Button(container1, width = 10, text = 'Enviar', command = enviarMensagem)
+	enviarMsgButton.grid(row = 1, column = 2)
+
+	root2.mainloop()
+#igBatePapo()
+
+def enviarMensagem():
+	global inputTexto
+	global textoSala
+
+	global nomeString
+	global nomeSalaString
+
+	msg = inputTexto.get()
+
+	s = goServidor()
+	MESSAGE = "EM"+KEYCONTROLLER+nomeString+KEYCONTROLLER+nomeSalaString+KEYCONTROLLER+msg
+	s.send(MESSAGE)
+	data = s.recv(BUFFER_SIZE)
+	
+	if data == KEYCONTROLLER+'sair'+KEYCONTROLLER : 
+		textoSala.insert(END, 'Você saiu.')
+		#sair
+
+	if data == KEYCONTROLLER+'textoAjuda'+KEYCONTROLLER: 
+		textoSala.insert(END, textoAjuda + '\n')
+
+	if(data[0]=='L' and data[1]=='U'):
+		data = data.split("LUSER-")
+		textoSala.insert(END, data[1] + '\n')
+
+	s.close()
+#enviarMensagem()
+
+#Exibe uma caixa de diálogo genérica, configurada pelos parâmetros
+def exibirMensagem(mensagem, titulo):
+	root = Tk()
+	root.geometry('170x60')
+	root.wm_title(titulo)
+
+	container0 = Frame(root)
+	container0.pack(padx = 10, pady = 13)
+
+	ipServidorLabel = Label(container0, text = mensagem)
+	ipServidorLabel.grid(row = 0, column = 0)
+	
+	root.mainloop()
+#exibirMensagem()
+
+def criaSala():
+	global nomeString
+	global nomeSalaString
+	global root
+
+	MESSAGE = "CS"+KEYCONTROLLER+nomeString+KEYCONTROLLER+nomeSalaString
 	s = goServidor()
 	s.send(MESSAGE)
+	data = s.recv(BUFFER_SIZE)
+
+	if data == KEYCONTROLLER+'salaInvalida'+KEYCONTROLLER: 
+		root.deiconify()
+		exibirMensagem("A sala já existe!", "Erro")
+	else:
+		# Esta thread cuida de atualizar o campo onde as mensagens da sala aparecem
+		t1 = threading.Thread(target = threadCaixaMensagens, args = (1, s))
+		t1.start()
+
+		# Cria a janela do bate papo
+		igBatePapo()
+	
+# criaSala()
+
+def threadCaixaMensagens(arg1, s):
+	global textoSala
 	while True:
 		data = s.recv(BUFFER_SIZE)
-
-		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: break
-		if data == KEYCONTROLLER+'salaInvalida'+KEYCONTROLLER: 
-			print "Ja existe uma sala com esse nome!\n"
+		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: 
+			textoSala.insert(END, 'Você foi excluído da sala! Adeus...')
 			break
 
-		print data
-# criaSala()
+		textoSala.insert(END, data + '\n')
+#threadCaixaMensagens()
 
 def separaNomeSala(lista, op):
 	for i in lista:
 		if(op in i):
 			return i[2:]
 #separaNomeSala():
-
-def envia():
-	nome = raw_input("Seu nome: ")
-
-	data = getSalas()
-	print data
-	sala = raw_input("Escolha uma sala: ")
-	sala = separaNomeSala(data.split('\n'),sala)
-	
-	while True:
-		msg = raw_input("Mensagem: ")
-		s = goServidor()
-		MESSAGE = "EM"+KEYCONTROLLER+nome+KEYCONTROLLER+sala+KEYCONTROLLER+msg
-		s.send(MESSAGE)
-		data  = s.recv(BUFFER_SIZE)
-		
-		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER : break
-
-		if data == KEYCONTROLLER+'textoAjuda'+KEYCONTROLLER: print textoAjuda
-
-		if(data[0]=='L' and data[1]=='U'):
-			data = data.split("LUSER-")
-			print(data[1])
-
-		s.close()
-#Envia()
 
 def entrar():
 	nome = raw_input("Seu nome:")
@@ -152,11 +220,6 @@ def setIp():
 	root1.destroy()
 #setIp()
 
-def okPressed():
-	
-	print TCP_IP
-#okPressed()
-
 def obtemIpServidor():
 	global root1
 	global ipServidorCampo
@@ -183,12 +246,32 @@ def obtemIpServidor():
 	root1.mainloop()
 #obtemIpServidor()
 
+def okPressed():
+	global nomeString
+	global nomeSalaString
+	global root
+	global op
+
+	if (op == 1): #Clicou em "Criar sala"
+		nomeString = nomeUsuarioCampo1.get()
+		nomeSalaString = nomeSalaCampo.get()
+		root.withdraw()
+		criaSala()
+	else:
+		nomeString = nomeUsuarioCampo2.get()
+
+
+	print TCP_IP
+#okPressed()
+
+
 def main():
 	global nomeSalaCampo
 	global nomeUsuarioCampo1
 	global nomeUsuarioCampo2
 	global salasComboBox
 	global btnOk
+	global root
 
 	obtemIpServidor()
 
@@ -265,9 +348,15 @@ def main():
 nomeSalaCampo = Entry
 nomeUsuarioCampo1 = Entry
 nomeUsuarioCampo2 = Entry
+textoSala = Text
+inputTexto = Entry
 salasComboBox = ttk.Combobox
 ipServidorCampo = Entry
+nomeSalaString = ''
+nomeString = ''
+root = Tk
 root1 = Tk
+root2 = Tk
 TCP_IP = ''
 btnOk = Button
 op = 0
@@ -278,5 +367,7 @@ TCP_PORT = 8000
 BUFFER_SIZE = 2048
 
 main()
+
+
 
 
