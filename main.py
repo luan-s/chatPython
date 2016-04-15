@@ -123,8 +123,6 @@ def entrarSala():
 
 #entrarSala()
 
-#Exibe uma caixa de diálogo genérica, configurada pelos parâmetros
->>>>>>> 28dab14ae1bc04a9b0deafe3defd7b5d750eef02
 def exibirMensagem(mensagem, titulo):
 	'''
 		Exibe uma caixa de diálogo genérica, configurada pelos parâmetros
