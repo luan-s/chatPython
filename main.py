@@ -93,7 +93,6 @@ def enviarMensagem():
 			textoSala.insert(END, 'Você saiu.')
 			#sair
 
-<<<<<<< HEAD
 	if data == KEYCONTROLLER+'textoAjuda'+KEYCONTROLLER: 
 		textoSala.insert(END, textoAjuda + '\n')
 		#ajuda
@@ -102,21 +101,10 @@ def enviarMensagem():
 		data = data.split("LUSER-")
 		textoSala.insert(END, data[1] + '\n')
 		#Listar usuario
-=======
-		if data == KEYCONTROLLER+'textoAjuda'+KEYCONTROLLER: 
-			textoSala.insert(END, textoAjuda + '\n')
-
-		if(data[0]=='L' and data[1]=='U'):
-			data = data.split("LUSER-")
-			textoSala.insert(END, data[1] + '\n')
->>>>>>> 28dab14ae1bc04a9b0deafe3defd7b5d750eef02
 
 	s.close()
 #enviarMensagem()
 
-<<<<<<< HEAD
-
-=======
 def entrarSala():
 	global nomeString
 	global nomeSalaString
