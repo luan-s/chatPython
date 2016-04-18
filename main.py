@@ -49,6 +49,7 @@ def igBatePapo():
 
 	inputTexto = Entry(container1, width = 25)
 	inputTexto.grid(row = 1, column = 0)
+	inputTexto.bind('<Return>', enviarMensagem)
 
 	labelEspacadora = Label(container1, text = '   ')
 	labelEspacadora.grid(row = 1, column = 1)
@@ -59,12 +60,12 @@ def igBatePapo():
 	root2.mainloop()
 #igBatePapo()
 
-def enviarMensagem():
+def enviarMensagem(arg1=''):
 	'''
 		Abre uma conexão com o servidor, envia a mensagem EM (enviar mensage) para ele,
 		em seguida recebe uma confirmação do servidor, caso a mensagem de confirmação for
 		alguma palavra de controle (sair, ajuda, listar ou romover) é a execução é encaminhada
-		para uma funcção especifica.
+		para uma função especifica.
 	'''
 	global inputTexto
 	global textoSala
@@ -72,23 +73,28 @@ def enviarMensagem():
 	global nomeSalaString
 
 	msg = inputTexto.get()
+
+	if (msg == ''):
+		return
+
+	inputTexto.delete(0, len(msg))
 	
 	s = goServidor()
 	MESSAGE = "EM"+KEYCONTROLLER+nomeString+KEYCONTROLLER+nomeSalaString+KEYCONTROLLER+msg
 	s.send(MESSAGE)
 	data = s.recv(BUFFER_SIZE)
 	
-	if (len(data) >= 2):
-		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER : 
-			textoSala.insert(END, 'Você saiu.')
-			#sair
+	#if (len(data) >= 2):
+	if data == KEYCONTROLLER+"sair"+KEYCONTROLLER : 
+		textoSala.insert(END, 'Você saiu.')
+		#sair
 
-		if data == KEYCONTROLLER+'textoAjuda'+KEYCONTROLLER: 
-			textoSala.insert(END, textoAjuda + '\n')
+	if data == KEYCONTROLLER+"textoAjuda"+KEYCONTROLLER: 
+		textoSala.insert(END, textoAjuda + '\n')
 
-		if(data[0]=='L' and data[1]=='U'):
-			data = data.split("LUSER-")
-			textoSala.insert(END, data[1] + '\n')
+	if(data[0]=='L' and data[1]=='U'):
+		data = data.split("LUSER-")
+		textoSala.insert(END, data[1] + '\n')
 
 	s.close()
 #enviarMensagem()
@@ -103,7 +109,7 @@ def entrarSala():
 	global nomeSalaString
 	global root
 
-	MESSAGE = "ES"+KEYCONTROLLER+nomeString+KEYCONTROLLER+nomeSalaString
+	MESSAGE = "ES" + KEYCONTROLLER + nomeString + KEYCONTROLLER + nomeSalaString
 	s = goServidor()
 	s.send(MESSAGE)
 
@@ -201,13 +207,6 @@ def getNumeroSalas():
 	return int(data)
 #GetNumeroSalas
 
-textoAjuda = '''\nComandos:\n
-	\n    /listar -> lista os usuários presentes na sala
-	\n    /remover -> remove um usuário da sala. Só pode ser usado pelo admin
-	\n    /sair -> sai da sala atual'
-	\n    /ajuda -> mostra o menu de ajuda\n\n'''
-#textoAjuda
-
 def criarSalaSelected():
 	'''
 		Verificar se a checkBox "criaSala" esta selecionada, 
@@ -236,7 +235,6 @@ def entrarSalaSelected():
 	nomeUsuarioCampo2['state'] = NORMAL
 	salasComboBox['state'] = NORMAL
 
-	print getNumeroSalas()
 	if (getNumeroSalas() > 0):
 		salasComboBox['values'] = getSalas().split('\n')
 
@@ -245,7 +243,7 @@ def entrarSalaSelected():
 	op = 2
 #entrarSalaSelected()
 
-def setIp(event):
+def setIp():
 	'''
 		"Seta" o ip digitado na variavel de controle do servidor
 	'''
@@ -281,10 +279,7 @@ def obtemIpServidor():
 	labelEspacadora = Label(container0, text = '   ')
 	labelEspacadora.grid(row = 0, column = 2)
 
-	#dialogOk = Button(container0, text = 'OK', command = setIp)
-	dialogOk = Button(container0, text = 'OK')
-	root1.bind('<Return>', setIp)
-
+	dialogOk = Button(container0, text = 'OK', command = setIp)
 	dialogOk.grid(row = 0, column = 3)
 	
 	root1.mainloop()
@@ -408,6 +403,13 @@ op = 0
 KEYCONTROLLER = '<ctrl>'
 TCP_PORT = 8000
 BUFFER_SIZE = 2048
+
+textoAjuda = '''\nComandos:\n
+	\n    /listar -> lista os usuários presentes na sala
+	\n    /remover -> remove um usuário da sala. Só pode ser usado pelo admin
+	\n    /sair -> sai da sala atual'
+	\n    /ajuda -> mostra o menu de ajuda\n\n'''
+#textoAjuda
 
 main()
 

@@ -1,3 +1,4 @@
+#encoding: utf-8
 class sala:
 	def __init__(self, nome="", ID=0):
 		self.nome = nome

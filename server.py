@@ -57,7 +57,7 @@ def thread1(arg1, eventoDeParada):
 				executaComando(comando,conn,addr[0])
 			else: 
 				salas.enviaMsg(msg[2], msg[3], msg[1])
-			conn.send('ok')
+				conn.send('ok')
 
 		if(data[:2] == 'LS'): #Lista de Salas
 			lista = salas.listaSalas()
