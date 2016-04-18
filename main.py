@@ -47,7 +47,7 @@ def igBatePapo():
 	container1 = Frame(root2)
 	container1.pack(padx = 10)
 
-	inputTexto = Entry(container1, width = 43)
+	inputTexto = Entry(container1, width = 25)
 	inputTexto.grid(row = 1, column = 0)
 
 	labelEspacadora = Label(container1, text = '   ')
