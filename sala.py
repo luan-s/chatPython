@@ -1,4 +1,5 @@
 #encoding: utf-8
+KEYCONTROLLER = '<ctrl>'
 class sala:
 	def __init__(self, nome="", ID=0):
 		self.nome = nome
@@ -15,7 +16,9 @@ class sala:
 
 	def adicionaUsuario(self, user, nome):
 			self.s[nome][0].append(user)
-			print 'Entrou na sala: ',self.s
+			#out = '\n"'+user.nome+'"\n'
+			#self.enviaMsg(nome,out,'Entrou na sala')
+
 
 	def enviaMsg(self, nomeSala, msg, nome):
 		msg = nome+': '+msg
@@ -51,6 +54,14 @@ class sala:
 		if self.s[nomeSala][1] == ip:
 			return True
 		return False
+
+	def removeUsuario(self, nome, nomeSala,conn):
+		for i in range(len(self.s[nomeSala][0])):
+			if self.s[nomeSala][0][i].nome == nome:
+				self.s[nomeSala][0][i].conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
+				self.s[nomeSala][0].pop(i)
+			conn.send('ok')
+
 
 	def getNumSalas(self):
 		return len(self.s)

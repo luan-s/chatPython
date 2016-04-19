@@ -54,7 +54,7 @@ def thread1(arg1, eventoDeParada):
 			comando = verificaComando(msg[3])
 
 			if comando != None:
-				executaComando(comando,conn,addr[0])
+				executaComando(comando,conn,addr[0],msg)
 			else: 
 				salas.enviaMsg(msg[2], msg[3], msg[1])
 				conn.send('ok')
@@ -92,11 +92,11 @@ def verificaComando(msg):
 	return None
 #VerificaComando()
 
-def executaComando(comando, conn, ip):
+def executaComando(comando, conn, ip,msg):
 	if(comando=="listar"): listar(ip,conn)
-	if(comando=="sair"): sair(conn)
+	if(comando=="sair"): sair(conn, comando, ip,msg)
 	if(comando=="ajuda"): ajuda(conn)
-	if(comando=="remover"): remove()
+	if(comando=="remover"): remove(conn, comando,ip,msg)
 #ececutaComando()
 
 def listar(ip,conn):
@@ -108,16 +108,21 @@ def listar(ip,conn):
 	conn.send(aux)
 #listar()
 
-def sair(conn):
+def sair(conn,comando,ip,msg):
+	
+	#salas.enviaMsg(aux[2], 'Saiu ', aux[1])
 	conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
+	salas.removeUsuario(msg[1],'lu',conn)
 #sair()
 
 def ajuda(conn):
 	conn.send(KEYCONTROLLER+"textoAjuda"+KEYCONTROLLER)
 #ajuda()
 
-def remove():
-	pass
+def remove(conn,comando,ip,msg ):
+	#salas.verificaAdm()
+	msg =  msg[3].split(" ")[1]
+	salas.removeUsuario(msg,'lu',conn)
 #remove()
 
 def parar():

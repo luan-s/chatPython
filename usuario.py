@@ -4,3 +4,4 @@ class usuario:
 		self.ip = ip
 		self.nome = nome
 		self.conn = s
+		self.salaAtual = None

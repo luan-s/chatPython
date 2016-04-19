@@ -20,7 +20,7 @@ def goServidor():
 	return s
 #GoServidor()
 
-def igBatePapo():
+def igBatePapo(titulo):
 	'''
 		Interface grafica da janeja "bate papo", onde é possivel enviar e
 		receber menssagens.
@@ -28,10 +28,11 @@ def igBatePapo():
 	global root2
 	global textoSala
 	global inputTexto
-
+	global scrollbar
+	
 	root2 = Tk()
 	root2.geometry('380x305')
-	root2.wm_title('Sala')
+	root2.wm_title(titulo)
 
 	container0 = Frame(root2)
 	container0.pack(padx = 10, pady = 10)
@@ -71,10 +72,11 @@ def enviarMensagem(arg1=''):
 	global textoSala
 	global nomeString
 	global nomeSalaString
+	global saiu
 
 	msg = inputTexto.get()
 
-	if (msg == ''):
+	if msg == '' or saiu == True:
 		return
 
 	inputTexto.delete(0, len(msg))
@@ -83,10 +85,10 @@ def enviarMensagem(arg1=''):
 	MESSAGE = "EM"+KEYCONTROLLER+nomeString+KEYCONTROLLER+nomeSalaString+KEYCONTROLLER+msg
 	s.send(MESSAGE)
 	data = s.recv(BUFFER_SIZE)
-	
-	#if (len(data) >= 2):
+
 	if data == KEYCONTROLLER+"sair"+KEYCONTROLLER : 
 		textoSala.insert(END, 'Você saiu.')
+		root2.destroy()
 		#sair
 
 	if data == KEYCONTROLLER+"textoAjuda"+KEYCONTROLLER: 
@@ -107,18 +109,21 @@ def entrarSala():
 	'''
 	global nomeString
 	global nomeSalaString
-	global root
+	global t2_stop
 
 	MESSAGE = "ES" + KEYCONTROLLER + nomeString + KEYCONTROLLER + nomeSalaString
 	s = goServidor()
 	s.send(MESSAGE)
 
+	titulo = "Sala: "+nomeSalaString+" | Usuario: "+nomeString
+
 	# Esta thread cuida de atualizar o campo onde as mensagens da sala aparecem
-	t1 = threading.Thread(target = threadCaixaMensagens, args = (1, s))
+	t2_stop = threading.Event()
+	t1 = threading.Thread(target = threadCaixaMensagens, args = (s, t2_stop))
 	t1.start()
 
 	# Cria a janela do bate papo
-	igBatePapo()
+	igBatePapo(titulo)
 
 #entrarSala()
 
@@ -149,37 +154,52 @@ def criaSala():
 	global nomeString
 	global nomeSalaString
 	global root
+	global t2_stop
 
 	MESSAGE = "CS"+KEYCONTROLLER+nomeString+KEYCONTROLLER+nomeSalaString
 	s = goServidor()
 	s.send(MESSAGE)
 	data = s.recv(BUFFER_SIZE)
 
+	titulo = "Sala: "+nomeSalaString+" | Usuario: "+nomeString
+
 	if data == KEYCONTROLLER+'salaInvalida'+KEYCONTROLLER: 
 		root.deiconify()
 		exibirMensagem("A sala já existe!", "Erro")
 	else:
 		# Esta thread cuida de atualizar o campo onde as mensagens da sala aparecem
-		t1 = threading.Thread(target = threadCaixaMensagens, args = (1, s))
+		t2_stop = threading.Event()
+		t1 = threading.Thread(target = threadCaixaMensagens, args = (s, t2_stop))
 		t1.start()
 
 		# Cria a janela do bate papo
-		igBatePapo()
+		igBatePapo(titulo)
 	
 # criaSala()
 
-def threadCaixaMensagens(arg1, s):
+def threadCaixaMensagens(s, eventoDeParada):
 	'''
 		Função que escuta as mensagens digitadas pelo usuario
 	'''
 	global textoSala
-	while True:
+	global t2_stop
+	global root2
+	global scrollbar
+	global saiu
+
+
+	while not eventoDeParada.is_set():
+		if saiu: break
 		data = s.recv(BUFFER_SIZE)
 		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: 
 			textoSala.insert(END, 'Você foi excluído da sala! Adeus...')
+			s.send("tchau")
+			saiu = True
+			t2_stop.set()
 			break
 
 		textoSala.insert(END, data + '\n')
+		textoSala.see(END)		
 #threadCaixaMensagens()
 
 def getSalas():
@@ -236,7 +256,9 @@ def entrarSalaSelected():
 	salasComboBox['state'] = NORMAL
 
 	if (getNumeroSalas() > 0):
-		salasComboBox['values'] = getSalas().split('\n')
+		aux = getSalas().split('\n')
+		aux.pop(len(aux)-1)
+		salasComboBox['values'] = aux
 
 	btnOk['text'] = 'Entrar'
 	btnOk.grid(row = 6, column = 0)
@@ -275,6 +297,8 @@ def obtemIpServidor():
 
 	ipServidorCampo = Entry(container0)
 	ipServidorCampo.grid(row = 0, column = 1)
+
+	ipServidorCampo.focus_set()
 
 	labelEspacadora = Label(container0, text = '   ')
 	labelEspacadora.grid(row = 0, column = 2)
@@ -390,14 +414,19 @@ textoSala = Text
 inputTexto = Entry
 salasComboBox = ttk.Combobox
 ipServidorCampo = Entry
+scrollbar = Scrollbar
 nomeSalaString = ''
 nomeString = ''
+
 root = Tk
 root1 = Tk
 root2 = Tk
+
+saiu = False
 TCP_IP = ''
 btnOk = Button
 op = 0
+t2_stop = threading.Event()
 # Fim variáveis globais
 
 KEYCONTROLLER = '<ctrl>'
