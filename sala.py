@@ -1,5 +1,6 @@
 #encoding: utf-8
 KEYCONTROLLER = '<ctrl>'
+from datetime import datetime
 class sala:
 	def __init__(self, nome="", ID=0):
 		self.nome = nome
@@ -21,7 +22,9 @@ class sala:
 
 
 	def enviaMsg(self, nomeSala, msg, nome):
-		msg = nome+': '+msg
+		now = datetime.now()
+		hora = str(now.hour)+':'+str(now.minute)+' '
+		msg = nome+' :\t\t\t\t'+hora+'\n'+msg+'\n'
 		for i in self.s[nomeSala][0]:
 			i.conn.send(msg)
 
