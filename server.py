@@ -109,10 +109,11 @@ def listar(ip,conn):
 #listar()
 
 def sair(conn,comando,ip,msg):
-	
+	nomeSala = salas.nomeSalaByUser(ip,msg[1])
+	if nomeSala == None: print "brecou"
 	#salas.enviaMsg(aux[2], 'Saiu ', aux[1])
 	conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
-	salas.removeUsuario(msg[1],'lu',conn)
+	salas.removeUsuario(msg[1],nomeSala,conn)
 #sair()
 
 def ajuda(conn):
@@ -121,8 +122,10 @@ def ajuda(conn):
 
 def remove(conn,comando,ip,msg ):
 	#salas.verificaAdm()
+	nomeSala = salas.nomeSalaByAdim(ip)
+	if nomeSala == None: print "brecou"
 	msg =  msg[3].split(" ")[1]
-	salas.removeUsuario(msg,'lu',conn)
+	salas.removeUsuario(msg,nomeSala,conn)
 #remove()
 
 def parar():

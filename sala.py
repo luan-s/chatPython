@@ -8,7 +8,7 @@ class sala:
 		
 	def criaSala(self, user, nome, ip):
 		if not nome in self.s:
-			aux = ([user],ip)
+			aux = ([user],user)
 			self.s[nome] = aux
 			print 'Sala Criada: ',self.s
 			return True
@@ -50,8 +50,8 @@ class sala:
 		
 		return nomes				
 
-	def isAdmin(self, ip, nomeSala):
-		if self.s[nomeSala][1] == ip:
+	def isAdmin(self, ip, nome,nomeSala):
+		if self.s[nomeSala][1].ip == ip and nome == self.s[nomeSala][1].nome:
 			return True
 		return False
 
@@ -62,6 +62,18 @@ class sala:
 				self.s[nomeSala][0].pop(i)
 			conn.send('ok')
 
+	def nomeSalaByAdim(self, ip):
+		for i in self.s:
+			if self.s[i][1].ip == ip:
+				return i
+		return None
+
+	def nomeSalaByUser(self, ip, nome):
+		for i in self.s:
+			for j in self.s[i][0]:
+				if j.ip == ip and j.nome == nome:
+					return i
+		return None
 
 	def getNumSalas(self):
 		return len(self.s)
