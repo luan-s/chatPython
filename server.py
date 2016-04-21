@@ -155,18 +155,22 @@ s.bind((TCP_IP, TCP_PORT))
 root = Tk();
 root.geometry('180x290')
 root.wm_title('Servidor')
+root.resizable(0,0)
 container = Frame(root)
 container.pack()
 
 btnStart = Button(container)
 btnStart.configure(text = 'Iniciar', padx = 30, pady = 10, command = iniciaThread)
+btnStart.configure(background='#CFD8DC')
 btnStart.pack(pady = 30)
 btnStop = Button(container)
 btnStop.configure(text = 'Parar', padx = 30, pady = 10, command = parar)
+btnStop.configure(background='#CFD8DC')
 btnStop.pack()
 
 container2 = Frame()
 container2.pack(pady = 30)
+
 
 LS = Label(container2, text = 'Status: ')
 LS.grid(row = 0, column = 0)

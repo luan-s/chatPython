@@ -33,6 +33,7 @@ def igBatePapo(titulo):
 	root2 = Tk()
 	root2.geometry('380x305')
 	root2.wm_title(titulo)
+	root2.resizable(0,0)
 
 	container0 = Frame(root2)
 	container0.pack(padx = 10, pady = 10)
@@ -286,6 +287,7 @@ def obtemIpServidor():
 	global ipServidorCampo
 
 	root1 = Tk()
+	root1.resizable(0,0)
 	root1.geometry('360x60')
 	root1.wm_title('Chat')
 
@@ -355,6 +357,7 @@ def main():
 	root = Tk()
 	root.geometry('370x250')
 	root.wm_title('Menu')
+	root.resizable(0,0)
 
 	container = Frame(root)
 	container.pack(anchor = W, padx = 20, pady = 10)
