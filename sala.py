@@ -17,16 +17,31 @@ class sala:
 
 	def adicionaUsuario(self, user, nome):
 			self.s[nome][0].append(user)
-			#out = '\n"'+user.nome+'"\n'
-			#self.enviaMsg(nome,out,'Entrou na sala')
-
+			out = '"'+user.nome+'"'
+			self.enviaMsg(nome,out,'Entrou na sala')
 
 	def enviaMsg(self, nomeSala, msg, nome):
-		now = datetime.now()
-		hora = str(now.hour)+':'+str(now.minute)+' '
-		msg = nome+' :\t\t\t\t'+hora+'\n'+msg+'\n'
+		timeStamp = self.getHoraFormatada()
+		msg = timeStamp + nome + ': ' + msg
 		for i in self.s[nomeSala][0]:
 			i.conn.send(msg)
+
+	def getHoraFormatada(self):
+		now = datetime.now()
+
+		if now.hour < 10:
+			horaString = '0' + str(now.hour)
+		else:
+			horaString = str(now.hour)
+
+		if now.minute < 10:
+			minutoString = '0' + str(now.minute)
+		else:
+			minutoString = str(now.minute)
+
+		timeStamp = '['+horaString+':'+minutoString+'] '
+
+		return timeStamp
 
 	def verificaSala(self, nomeSala):
 		for nomeSala in self.s:
@@ -63,6 +78,9 @@ class sala:
 			if self.s[nomeSala][0][i].nome == nome:
 				self.s[nomeSala][0][i].conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
 				self.s[nomeSala][0].pop(i)
+				nome = '"'+nome+'"'
+				self.enviaMsg(nomeSala, nome, 'Saiu da sala')
+
 			conn.send('ok')
 
 	def nomeSalaByAdim(self, ip):

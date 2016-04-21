@@ -90,14 +90,14 @@ def enviarMensagem(arg1=''):
 	if data == KEYCONTROLLER+"sair"+KEYCONTROLLER : 
 		textoSala.insert(END, 'Você saiu.')
 		root2.destroy()
-		#sair
+		root.deiconify()
 
 	if data == KEYCONTROLLER+"textoAjuda"+KEYCONTROLLER: 
 		textoSala.insert(END, textoAjuda + '\n')
 
 	if(data[0]=='L' and data[1]=='U'):
 		data = data.split("LUSER-")
-		textoSala.insert(END, data[1] + '\n')
+		textoSala.insert(END, 'Usuarios na sala:\n' + data[1] + '\n')
 
 	s.close()
 #enviarMensagem()
@@ -111,10 +111,12 @@ def entrarSala():
 	global nomeString
 	global nomeSalaString
 	global t2_stop
+	global root2
 
 	MESSAGE = "ES" + KEYCONTROLLER + nomeString + KEYCONTROLLER + nomeSalaString
 	s = goServidor()
 	s.send(MESSAGE)
+	s.recv(BUFFER_SIZE)
 
 	titulo = "Sala: "+nomeSalaString+" | Usuario: "+nomeString
 
@@ -127,23 +129,6 @@ def entrarSala():
 	igBatePapo(titulo)
 
 #entrarSala()
-
-def exibirMensagem(mensagem, titulo):
-	'''
-		Exibe uma caixa de diálogo genérica, configurada pelos parâmetros
-	'''
-	root = Tk()
-	root.geometry('170x60')
-	root.wm_title(titulo)
-
-	container0 = Frame(root)
-	container0.pack(padx = 10, pady = 13)
-
-	ipServidorLabel = Label(container0, text = mensagem)
-	ipServidorLabel.grid(row = 0, column = 0)
-	
-	root.mainloop()
-#exibirMensagem()
 
 def criaSala():
 	'''
@@ -188,7 +173,6 @@ def threadCaixaMensagens(s, eventoDeParada):
 	global scrollbar
 	global saiu
 
-
 	while not eventoDeParada.is_set():
 		if saiu: break
 		data = s.recv(BUFFER_SIZE)
@@ -202,6 +186,23 @@ def threadCaixaMensagens(s, eventoDeParada):
 		textoSala.insert(END, data + '\n')
 		textoSala.see(END)		
 #threadCaixaMensagens()
+
+def exibirMensagem(mensagem, titulo):
+	'''
+		Exibe uma caixa de diálogo genérica, configurada pelos parâmetros
+	'''
+	root = Tk()
+	root.geometry('170x60')
+	root.wm_title(titulo)
+
+	container0 = Frame(root)
+	container0.pack(padx = 10, pady = 13)
+
+	ipServidorLabel = Label(container0, text = mensagem)
+	ipServidorLabel.grid(row = 0, column = 0)
+	
+	root.mainloop()
+#exibirMensagem()
 
 def getSalas():
 	'''
@@ -331,8 +332,6 @@ def okPressed():
 		nomeString = nomeUsuarioCampo2.get()
 		root.withdraw()
 		entrarSala()
-
-	print TCP_IP
 #okPressed()
 
 def salaSelecionada(event):

@@ -111,9 +111,9 @@ def listar(ip,conn):
 def sair(conn,comando,ip,msg):
 	nomeSala = salas.nomeSalaByUser(ip,msg[1])
 	if nomeSala == None: print "brecou"
-	#salas.enviaMsg(aux[2], 'Saiu ', aux[1])
 	conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
 	salas.removeUsuario(msg[1],nomeSala,conn)
+
 #sair()
 
 def ajuda(conn):
