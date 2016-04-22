@@ -1,12 +1,12 @@
 #encoding: utf-8
-import sala, socket, ttk, threading
+import socket, ttk, threading
 from Tkinter import *
 import tkMessageBox
 
 def goServidor():
 	'''
 		Abre uma conexão com o servidor,
-		caso a de erro na conexão, é feita uma nova tentativa
+		caso de erro na conexão, é feita uma nova tentativa
 		retorna o objeto Socket
 	'''
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -84,7 +84,8 @@ def enviarMensagem(arg1=''):
 	
 	s = goServidor()
 	MESSAGE = "EM"+KEYCONTROLLER+nomeString+KEYCONTROLLER+nomeSalaString+KEYCONTROLLER+msg
-	s.send(MESSAGE)
+
+	s.send(MESSAGE.encode('utf8'))
 	data = s.recv(BUFFER_SIZE)
 
 	if data == KEYCONTROLLER+"sair"+KEYCONTROLLER : 
@@ -94,6 +95,8 @@ def enviarMensagem(arg1=''):
 
 	if data == KEYCONTROLLER+"textoAjuda"+KEYCONTROLLER: 
 		textoSala.insert(END, textoAjuda + '\n')
+		textoSala.see(END)
+
 
 	if(data[0]=='L' and data[1]=='U'):
 		data = data.split("LUSER-")
@@ -116,7 +119,11 @@ def entrarSala():
 	MESSAGE = "ES" + KEYCONTROLLER + nomeString + KEYCONTROLLER + nomeSalaString
 	s = goServidor()
 	s.send(MESSAGE)
-	s.recv(BUFFER_SIZE)
+	data = s.recv(BUFFER_SIZE)
+
+	if data == KEYCONTROLLER+'usuarioInvalido'+KEYCONTROLLER: 
+		root.deiconify()
+		exibirMensagem("Username já utilizado!", "Erro")
 
 	titulo = "Sala: "+nomeSalaString+" | Usuario: "+nomeString
 
@@ -344,6 +351,10 @@ def salaSelecionada(event):
 #salaSelecionada()
 
 def main():
+	'''
+		Método Main primeiro a ser executado pelo programa, define as propriedades da
+		janela menu e exibe na tela.
+	'''
 	global nomeSalaCampo
 	global nomeUsuarioCampo1
 	global nomeUsuarioCampo2
@@ -354,7 +365,7 @@ def main():
 	obtemIpServidor()
 
 	root = Tk()
-	root.geometry('370x250')
+	root.geometry('330x250')
 	root.wm_title('Menu')
 	root.resizable(0,0)
 
@@ -435,6 +446,8 @@ KEYCONTROLLER = '<ctrl>'
 TCP_PORT = 8000
 BUFFER_SIZE = 2048
 
+
+#Texto usado no comendo /ajuda
 textoAjuda = '''\nComandos:\n
 	\n    /listar -> lista os usuários presentes na sala
 	\n    /remover -> remove um usuário da sala. Só pode ser usado pelo admin

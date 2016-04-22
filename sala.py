@@ -98,3 +98,13 @@ class sala:
 
 	def getNumSalas(self):
 		return len(self.s)
+
+	def usuarioInSala(self, nome, nomeSala):
+		for i in self.s[nomeSala][0]:
+			if nome == i.nome:
+				return 1
+		return 0
+
+	def removeTodos(self,nomeSala):
+		for i in self.s[nomeSala][0]:
+			i.conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)

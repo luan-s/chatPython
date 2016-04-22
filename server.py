@@ -5,16 +5,20 @@ from Tkinter import *
 KEYCONTROLLER = '<ctrl>'
 
 def trocaStatus(codBotao):
+	'''
+		Função que troca o Status da label do servidor 
+		para rodando ou Parado.
+	'''
 	global status
 	global statusLabel
 
 	print codBotao
 	if not status  and codBotao == 1:
-		statusLabel['text'] = 'rodando'
+		statusLabel['text'] = 'Rodando'
 		statusLabel['fg'] = '#0C0'
 		status = True
 	elif status and codBotao == 2:
-		statusLabel['text'] = 'parado'
+		statusLabel['text'] = 'Parado'
 		statusLabel['fg'] = '#C00'
 		status = False
 #trocaStatus()
@@ -28,6 +32,36 @@ def iniciaThread():
 #iniciaThread()
 
 def thread1(arg1, eventoDeParada):
+	'''
+		Caso o servidor esteja com o estado "rodando", a função mostra o ip do Servidor,
+		e a  porta.
+		Além disso, a partir desse momento, fica "escutando" qualquer mensagem que possa
+		vir dos clientes conectados a ele, que pode ser:
+
+		CS: Criar Sala
+			o servidor verifica se a sala já existe, se sim é retornado uma msg de erro
+			se não, é criada uma nova sala com o nome informado pelo cliente, o cliente 
+			que criou, é setado como adm da sala.
+
+		EM: Enviar mensagem
+			Recebe o nome da sala, o nome do usuario e a mensagem a ser enviada, a função 
+			verifica se a mensagem é um comando especial (/sair, /ajuda, /remover ou /listar)
+			caso seja um desses é feito o encaminhamento pra uma função que vai tratar o comando
+			caso não seja, a mensagem é enviada para todos que estão na sala.
+
+		LS: Listar Salas
+			Envia para o cliente o nome de todas as salas já criadas.
+
+		ES:
+			Recebe do usuario o nome dele, e a sala que ele deseja entrar
+			verifica se já existe um usuario com aquele nome na sala, se sim 
+			é retornado uma msg de erro, se não, o usuário é adicionado na sala
+			que ele escolheu.
+
+		NS:
+			Retorna o numero de salas existentes.
+
+	'''
 	global numeroSalasLabel
 	global numeroSalas
 	
@@ -68,8 +102,13 @@ def thread1(arg1, eventoDeParada):
 
 		if(data[:2] == 'ES'): #Entrar em Sala
 			aux = data.split(KEYCONTROLLER)
-			user = usuario.usuario(aux[1],addr[0],conn)
-			salas.adicionaUsuario(user,aux[2])
+
+			if salas.usuarioInSala(aux[1],aux[2]):
+				msg = KEYCONTROLLER+'usuarioInvalido'+KEYCONTROLLER
+				conn.send(msg)
+			else:
+				user = usuario.usuario(aux[1],addr[0],conn)
+				salas.adicionaUsuario(user,aux[2])
 
 		if(data[:2] == 'NS'): #Numero de Salas
 			conn.send(str(salas.getNumSalas()))
@@ -78,6 +117,10 @@ def thread1(arg1, eventoDeParada):
 #thread1()
 
 def verificaComando(msg):
+	'''
+		Função que verifica se a mensagem enviada pelo cliente é uma comando.
+		retorna uma string contendo o comando caso seja um, caso não seja retorna None.
+	'''
 	comando = ''
 	if msg == '': return None
 	if msg[0]=='/':
@@ -93,6 +136,9 @@ def verificaComando(msg):
 #VerificaComando()
 
 def executaComando(comando, conn, ip,msg):
+	'''
+		Recebe o comando e encaminha para a função de tratamento.
+	'''
 	if(comando=="listar"): listar(ip,conn)
 	if(comando=="sair"): sair(conn, comando, ip,msg)
 	if(comando=="ajuda"): ajuda(conn)
@@ -100,6 +146,9 @@ def executaComando(comando, conn, ip,msg):
 #ececutaComando()
 
 def listar(ip,conn):
+	'''
+		Lista todos usuarios dentro de uma sala
+	'''
 	aux = ''
 	lista = salas.listaUsuarios(ip)
 	for i in lista:
@@ -109,7 +158,12 @@ def listar(ip,conn):
 #listar()
 
 def sair(conn,comando,ip,msg):
+	'''
+		Remove o usuario que enviou a mensagem da sala.
+	'''
 	nomeSala = salas.nomeSalaByUser(ip,msg[1])
+	if salas.isAdmin(ip,msg[1],msg[2]): 
+		salas.removeTodos(nomeSala)
 	if nomeSala == None: print "brecou"
 	conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
 	salas.removeUsuario(msg[1],nomeSala,conn)
@@ -117,15 +171,23 @@ def sair(conn,comando,ip,msg):
 #sair()
 
 def ajuda(conn):
+	'''
+		Exibe o texto de ajuda
+	'''
 	conn.send(KEYCONTROLLER+"textoAjuda"+KEYCONTROLLER)
 #ajuda()
 
 def remove(conn,comando,ip,msg ):
-	#salas.verificaAdm()
-	nomeSala = salas.nomeSalaByAdim(ip)
-	if nomeSala == None: print "brecou"
-	msg =  msg[3].split(" ")[1]
-	salas.removeUsuario(msg,nomeSala,conn)
+	'''
+		verifica se o usuario é o admin, se sim retira um usuario da sala.
+	'''
+	if salas.isAdmin(ip,msg[1],msg[2]):
+		conn.send("ok")
+	else:
+		nomeSala = salas.nomeSalaByAdim(ip)
+		if nomeSala == None: print "brecou"
+		msg =  msg[3].split(" ")[1]
+		salas.removeUsuario(msg,nomeSala,conn)
 #remove()
 
 def parar():
@@ -135,6 +197,9 @@ def parar():
 #parar()
 
 def atualizaNSalas():
+	'''
+		atualiza a label com o numero coorente de salas.
+	'''
 	numeroSalasLabel['text'] = salas.getNumSalas()
 #atualizaNSalas()
 
