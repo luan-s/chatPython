@@ -31,7 +31,7 @@ def igBatePapo(titulo):
 	global scrollbar
 	
 	root2 = Tk()
-	root2.geometry('380x305')
+	root2.geometry('380x335')
 	root2.wm_title(titulo)
 	root2.resizable(0,0)
 
@@ -52,15 +52,80 @@ def igBatePapo(titulo):
 	inputTexto = Entry(container1, width = 25)
 	inputTexto.grid(row = 1, column = 0)
 	inputTexto.bind('<Return>', enviarMensagem)
+	inputTexto.focus_set()
 
-	labelEspacadora = Label(container1, text = '   ')
-	labelEspacadora.grid(row = 1, column = 1)
+	labelEspacadora1 = Label(container1, text = '   ')
+	labelEspacadora1.grid(row = 1, column = 1)
 
 	enviarMsgButton = Button(container1, width = 10, text = 'Enviar', command = enviarMensagem)
 	enviarMsgButton.grid(row = 1, column = 2)
 
+	#Emotes ------------------------------------------------------------------------------------------------
+
+	container2 = Frame(root2)
+	container2.pack(pady = 10)
+
+	emoteFelizButton = Button(container2, width = 4, text = '(•‿•)', command = felizPressed)
+	emoteFelizButton.grid(row = 2, column = 0)
+
+	labelEspacadora2 = Label(container2, text = '  ')
+	labelEspacadora2.grid(row = 2, column = 1)
+
+	emoteTristeButton = Button(container2, width = 4, text = '(>▂<)', command = tristePressed)
+	emoteTristeButton.grid(row = 2, column = 2)
+
+	labelEspacadora3 = Label(container2, text = '  ')
+	labelEspacadora3.grid(row = 2, column = 3)
+
+	emoteRaivaButton = Button(container2, width = 4, text = '(¬_¬)', command = raivaPressed)
+	emoteRaivaButton.grid(row = 2, column = 4)
+
+	labelEspacadora4 = Label(container2, text = '  ')
+	labelEspacadora4.grid(row = 2, column = 5)
+
+	emoteCreepyButton = Button(container2, width = 4, text = '(ಠᴗಠ)', command = creepyPressed)
+	emoteCreepyButton.grid(row = 2, column = 6)
+
+	labelEspacadora5 = Label(container2, text = '  ')
+	labelEspacadora5.grid(row = 2, column = 7)
+
+	emoteCryButton = Button(container2, width = 4, text = '(ಥ_ಥ)', command = cryPressed)
+	emoteCryButton.grid(row = 2, column = 8)
+
+	#Fim emotes --------------------------------------------------------------------------------------------
+
 	root2.mainloop()
 #igBatePapo()
+
+def tristePressed():
+	global inputTexto
+	inputTexto.insert(END, '(>▂<)')
+	inputTexto.focus_set()
+#tristePressed()
+
+def felizPressed():
+	global inputTexto
+	inputTexto.insert(END, '(•‿•)')
+	inputTexto.focus_set()
+#felizPressed()
+
+def raivaPressed():
+	global inputTexto
+	inputTexto.insert(END, '(¬_¬)')
+	inputTexto.focus_set()
+#raivaPressed()
+
+def creepyPressed():
+	global inputTexto
+	inputTexto.insert(END, '(ಠᴗಠ)')
+	inputTexto.focus_set()
+#creepyPressed()
+
+def cryPressed():
+	global inputTexto
+	inputTexto.insert(END, '(ಥ_ಥ)')
+	inputTexto.focus_set()
+#cryPressed()
 
 def enviarMensagem(arg1=''):
 	'''
@@ -329,6 +394,9 @@ def okPressed():
 	global nomeSalaString
 	global root
 	global op
+	global saiu
+
+	saiu = False
 
 	if (op == 1): #Clicou em "Criar sala"
 		nomeString = nomeUsuarioCampo1.get()
@@ -450,8 +518,8 @@ BUFFER_SIZE = 2048
 #Texto usado no comendo /ajuda
 textoAjuda = '''\nComandos:\n
 	\n    /listar -> lista os usuários presentes na sala
-	\n    /remover -> remove um usuário da sala. Só pode ser usado pelo admin
-	\n    /sair -> sai da sala atual'
+	\n    /remover <nome> -> remove um usuário da sala. Só pode ser usado pelo admin
+	\n    /sair -> sai da sala atual
 	\n    /ajuda -> mostra o menu de ajuda\n\n'''
 #textoAjuda
 

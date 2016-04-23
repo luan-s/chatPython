@@ -263,7 +263,7 @@ numeroSalasLabel.grid(row = 3, column = 1)
 
 # Fim da GUI --------------------------------------------------------------------------
 
+iniciaThread()
+
 root.mainloop()
-
-
 
