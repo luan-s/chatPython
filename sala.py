@@ -9,7 +9,7 @@ class sala:
 		
 	def criaSala(self, user, nome, ip):
 		if not nome in self.s:
-			aux = ([user],user)
+			aux = [[user],user]
 			self.s[nome] = aux
 			print 'Sala Criada: ',self.s
 			return True
@@ -106,5 +106,9 @@ class sala:
 		return 0
 
 	def removeTodos(self,nomeSala):
+		print self.s[nomeSala][0]
 		for i in self.s[nomeSala][0]:
 			i.conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
+
+		self.s[nomeSala][0] = []
+		self.s.pop(nomeSala)

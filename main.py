@@ -154,9 +154,7 @@ def enviarMensagem(arg1=''):
 	data = s.recv(BUFFER_SIZE)
 
 	if data == KEYCONTROLLER+"sair"+KEYCONTROLLER : 
-		textoSala.insert(END, 'Você saiu.')
-		root2.destroy()
-		root.deiconify()
+		pass
 
 	if data == KEYCONTROLLER+"textoAjuda"+KEYCONTROLLER: 
 		textoSala.insert(END, textoAjuda + '\n')
@@ -233,7 +231,7 @@ def criaSala():
 		# Cria a janela do bate papo
 		igBatePapo(titulo)
 	
-# criaSala()
+#criaSala()
 
 def threadCaixaMensagens(s, eventoDeParada):
 	'''
@@ -248,8 +246,12 @@ def threadCaixaMensagens(s, eventoDeParada):
 	while not eventoDeParada.is_set():
 		if saiu: break
 		data = s.recv(BUFFER_SIZE)
+
+		print data
+
 		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: 
-			textoSala.insert(END, 'Você foi excluído da sala! Adeus...')
+			root2.destroy()
+			root.deiconify()
 			s.send("tchau")
 			saiu = True
 			t2_stop.set()
