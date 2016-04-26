@@ -154,8 +154,6 @@ def enviarMensagem(arg1=''):
 	data = s.recv(BUFFER_SIZE)
 
 	if data == KEYCONTROLLER+"sair"+KEYCONTROLLER : 
-		print "aqui 2"
-		textoSala.insert(END, 'Você saiu.')
 		root2.destroy()
 		root.deiconify()
 
@@ -163,10 +161,14 @@ def enviarMensagem(arg1=''):
 		textoSala.insert(END, textoAjuda + '\n')
 		textoSala.see(END)
 
-
 	if(data[0]=='L' and data[1]=='U'):
 		data = data.split("LUSER-")
 		textoSala.insert(END, 'Usuarios na sala:\n' + data[1] + '\n')
+		textoSala.see(END)
+
+	if data == KEYCONTROLLER+'isNotAdm'+KEYCONTROLLER:
+		textoSala.insert(END, "\nVocê não é o administrador da sala!\n")
+		textoSala.see(END)	
 
 	s.close()
 #enviarMensagem()
@@ -254,7 +256,6 @@ def threadCaixaMensagens(s, eventoDeParada):
 		print data
 
 		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: 
-			textoSala.insert(END, 'Você foi excluído da sala! Adeus...')
 			s.send("tchau")
 			saiu = True
 			t2_stop.set()

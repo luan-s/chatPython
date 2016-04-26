@@ -181,10 +181,10 @@ def ajuda(conn):
 
 def remove(conn,comando,ip,msg ):
 	'''
-		verifica se o usuario é o admin, se sim retira um usuario da sala.
+		Verifica se o usuario é o admin, se sim retira um usuario da sala.
 	'''
-	if salas.isAdmin(ip,msg[1],msg[2]):
-		conn.send("ok")
+	if not salas.isAdmin(ip,msg[1],msg[2]):
+		conn.send(KEYCONTROLLER+"isNotAdm"+KEYCONTROLLER)
 	else:
 		nomeSala = salas.nomeSalaByAdim(ip)
 		if nomeSala == None: print "brecou"
