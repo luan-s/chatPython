@@ -74,6 +74,8 @@ def thread1(arg1, eventoDeParada):
 
 		data = conn.recv(BUFFER_SIZE)
 
+		print "recebeu : " + data
+
 		if(data[:2] == 'CS'): #Cria Sala
 			aux = data.split(KEYCONTROLLER)
 			user = usuario.usuario(aux[1],addr[0],conn)
@@ -162,11 +164,9 @@ def sair(conn,comando,ip,msg):
 		Remove o usuario que enviou a mensagem da sala.
 	'''
 	nomeSala = salas.nomeSalaByUser(ip,msg[1])
-	if salas.isAdmin(ip,msg[1],msg[2]): 
-		print 'e servidorrrrr'
-		salas.removeTodos(nomeSala)
-		return
-
+	'''if salas.isAdmin(ip,msg[1],msg[2]): 
+		salas.removeTodoss(nomeSala)'''
+		
 	conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
 	salas.removeUsuario(msg[1],nomeSala,conn)
 
