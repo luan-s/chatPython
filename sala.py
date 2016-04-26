@@ -75,11 +75,14 @@ class sala:
 
 	def removeUsuario(self, nome, nomeSala,conn):
 		for i in range(len(self.s[nomeSala][0])):
-			if self.s[nomeSala][0][i].nome == nome:
+			print 'LEN: ',len(self.s[nomeSala][0])
+			print 'Lista: ',self.s[nomeSala][0]
+			if len(self.s[nomeSala][0]) > 0 and self.s[nomeSala][0][i].nome == nome:
 				self.s[nomeSala][0][i].conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
 				self.s[nomeSala][0].pop(i)
 				nome = '"'+nome+'"'
 				self.enviaMsg(nomeSala, nome, 'Saiu da sala')
+				break
 
 			conn.send('ok')
 
@@ -107,8 +110,10 @@ class sala:
 
 	def removeTodos(self,nomeSala):
 		print self.s[nomeSala][0]
-		for i in self.s[nomeSala][0]:
-			i.conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
+		for i in range(len(self.s[nomeSala][0])):
+			if i != 0 :
+				self.s[nomeSala][0][i].conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
+		print("oi")
 
-		self.s[nomeSala][0] = []
-		self.s.pop(nomeSala)
+		#self.s[nomeSala][0] = []
+		#self.s.pop(nomeSala)
