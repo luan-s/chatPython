@@ -154,7 +154,10 @@ def enviarMensagem(arg1=''):
 	data = s.recv(BUFFER_SIZE)
 
 	if data == KEYCONTROLLER+"sair"+KEYCONTROLLER : 
-		pass
+		print "aqui 2"
+		textoSala.insert(END, 'Você saiu.')
+		root2.destroy()
+		root.deiconify()
 
 	if data == KEYCONTROLLER+"textoAjuda"+KEYCONTROLLER: 
 		textoSala.insert(END, textoAjuda + '\n')
@@ -187,16 +190,16 @@ def entrarSala():
 	if data == KEYCONTROLLER+'usuarioInvalido'+KEYCONTROLLER: 
 		root.deiconify()
 		exibirMensagem("Username já utilizado!", "Erro")
+	else:
+		titulo = "Sala: "+nomeSalaString+" | Usuario: "+nomeString
 
-	titulo = "Sala: "+nomeSalaString+" | Usuario: "+nomeString
+		# Esta thread cuida de atualizar o campo onde as mensagens da sala aparecem
+		t2_stop = threading.Event()
+		t1 = threading.Thread(target = threadCaixaMensagens, args = (s, t2_stop))
+		t1.start()
 
-	# Esta thread cuida de atualizar o campo onde as mensagens da sala aparecem
-	t2_stop = threading.Event()
-	t1 = threading.Thread(target = threadCaixaMensagens, args = (s, t2_stop))
-	t1.start()
-
-	# Cria a janela do bate papo
-	igBatePapo(titulo)
+		# Cria a janela do bate papo
+		igBatePapo(titulo)
 
 #entrarSala()
 
@@ -242,6 +245,7 @@ def threadCaixaMensagens(s, eventoDeParada):
 	global root2
 	global scrollbar
 	global saiu
+	global root
 
 	while not eventoDeParada.is_set():
 		if saiu: break
@@ -250,15 +254,14 @@ def threadCaixaMensagens(s, eventoDeParada):
 		print data
 
 		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: 
-			root2.destroy()
-			root.deiconify()
+			textoSala.insert(END, 'Você foi excluído da sala! Adeus...')
 			s.send("tchau")
 			saiu = True
 			t2_stop.set()
 			break
-
-		textoSala.insert(END, data + '\n')
-		textoSala.see(END)		
+		else:
+			textoSala.insert(END, data + '\n')
+			textoSala.see(END)	
 #threadCaixaMensagens()
 
 def exibirMensagem(mensagem, titulo):
