@@ -3,6 +3,21 @@ import socket, ttk, threading
 from Tkinter import *
 import tkMessageBox
 
+
+try:
+	import winsound
+except ImportError:
+	import os
+	def playsound(frequency,duration):
+		os.system('beep -f %s -l %s'%(frequency,duration))
+		os.system('beep -f %s -l %s'%(frequency,duration))
+else:
+	def playsound(frequency,duration):
+		winsound.Beep(frequency,duration)
+		winsound.Beep(frequency+100,duration+50)
+
+
+
 def goServidor():
 	'''
 		Abre uma conexão com o servidor,
@@ -152,7 +167,7 @@ def enviarMensagem(arg1=''):
 
 	s.send(MESSAGE.encode('utf8'))
 	data = s.recv(BUFFER_SIZE)
-
+	print root2.focus_get()
 	if data == KEYCONTROLLER+"sair"+KEYCONTROLLER : 
 		root2.destroy()
 		root.deiconify()
@@ -252,8 +267,7 @@ def threadCaixaMensagens(s, eventoDeParada):
 	while not eventoDeParada.is_set():
 		if saiu: break
 		data = s.recv(BUFFER_SIZE)
-
-		print data
+		
 
 		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: 
 			s.send("tchau")
@@ -261,6 +275,9 @@ def threadCaixaMensagens(s, eventoDeParada):
 			t2_stop.set()
 			break
 		else:
+			if(data.split(" ")[1].split(':')[0] != nomeString):
+				t4 = threading.Thread(target = playsound, args = (500,100))
+				t4.start()
 			textoSala.insert(END, data + '\n')
 			textoSala.see(END)	
 #threadCaixaMensagens()
