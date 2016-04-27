@@ -3,20 +3,18 @@ import socket, ttk, threading
 from Tkinter import *
 import tkMessageBox
 
-
 try:
 	import winsound
 except ImportError:
 	import os
 	def playsound(frequency,duration):
-		os.system('beep -f %s -l %s'%(frequency,duration))
-		os.system('beep -f %s -l %s'%(frequency,duration))
+		os.system('( speaker-test -t sine -f 1000 )& pid=$! ; sleep 0.1s ; kill -9 $pid > tmp.tmp')
+		os.system('( speaker-test -t sine -f 1000 )& pid=$! ; sleep 0.1s ; kill -9 $pid > tmp.tmp')
+		os.system('rm tmp.tmp')
 else:
 	def playsound(frequency,duration):
 		winsound.Beep(frequency,duration)
 		winsound.Beep(frequency+100,duration+50)
-
-
 
 def goServidor():
 	'''
@@ -167,7 +165,6 @@ def enviarMensagem(arg1=''):
 
 	s.send(MESSAGE.encode('utf8'))
 	data = s.recv(BUFFER_SIZE)
-	print root2.focus_get()
 	if data == KEYCONTROLLER+"sair"+KEYCONTROLLER : 
 		root2.destroy()
 		root.deiconify()
@@ -537,7 +534,6 @@ KEYCONTROLLER = '<ctrl>'
 TCP_PORT = 8000
 BUFFER_SIZE = 2048
 
-
 #Texto usado no comendo /ajuda
 textoAjuda = '''\nComandos:\n
 	\n    /listar -> lista os usuários presentes na sala
@@ -547,7 +543,3 @@ textoAjuda = '''\nComandos:\n
 #textoAjuda
 
 main()
-
-
-
-
