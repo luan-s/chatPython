@@ -8,8 +8,8 @@ try:
 except ImportError:
 	import os
 	def playsound(frequency,duration):
-		os.system('( speaker-test -t sine -f 1000 )& pid=$! ; sleep 0.1s ; kill -9 $pid > tmp.tmp')
-		os.system('( speaker-test -t sine -f 1000 )& pid=$! ; sleep 0.1s ; kill -9 $pid > tmp.tmp')
+		os.system('( speaker-test -t sine -f %s )& pid=$! ; sleep 0.1s ; kill -9 $pid > tmp.tmp'%(frequency,))
+		os.system('( speaker-test -t sine -f %s )& pid=$! ; sleep 0.1s ; kill -9 $pid > tmp.tmp'%(100+frequency,))
 		os.system('rm tmp.tmp')
 else:
 	def playsound(frequency,duration):
