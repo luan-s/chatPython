@@ -12,7 +12,6 @@ def trocaStatus(codBotao):
 	global status
 	global statusLabel
 
-	print codBotao
 	if not status  and codBotao == 1:
 		statusLabel['text'] = 'Rodando'
 		statusLabel['fg'] = '#0C0'
@@ -68,13 +67,9 @@ def thread1(arg1, eventoDeParada):
 	ipLabel['text'] = TCP_IP
 	portaLabel['text'] = TCP_PORT
 	while not eventoDeParada.is_set():
-		#print 'Thread 1 rodando \n'
 		s.listen(1)
 		conn, addr = s.accept()
-
 		data = conn.recv(BUFFER_SIZE)
-
-		print "recebeu : " + data
 
 		if(data[:2] == 'CS'): #Cria Sala
 			aux = data.split(KEYCONTROLLER)
@@ -120,7 +115,7 @@ def thread1(arg1, eventoDeParada):
 
 def verificaComando(msg):
 	'''
-		Função que verifica se a mensagem enviada pelo cliente é uma comando.
+		Função que verifica se a mensagem enviada pelo cliente é um comando.
 		retorna uma string contendo o comando caso seja um, caso não seja retorna None.
 	'''
 	comando = ''
@@ -163,13 +158,9 @@ def sair(conn,comando,ip,msg):
 	'''
 		Remove o usuario que enviou a mensagem da sala.
 	'''
-	nomeSala = salas.nomeSalaByUser(ip,msg[1])
-	'''if salas.isAdmin(ip,msg[1],msg[2]): 
-		salas.removeTodoss(nomeSala)'''
-		
+	nomeSala = salas.nomeSalaByUser(ip,msg[1])	
 	conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
 	salas.removeUsuario(msg[1],nomeSala,conn)
-
 #sair()
 
 def ajuda(conn):
@@ -187,7 +178,6 @@ def remove(conn,comando,ip,msg ):
 		conn.send(KEYCONTROLLER+"isNotAdm"+KEYCONTROLLER)
 	else:
 		nomeSala = salas.nomeSalaByAdim(ip)
-		if nomeSala == None: print "brecou"
 		msg =  msg[3].split(" ")[1]
 		salas.removeUsuario(msg,nomeSala,conn)
 #remove()
@@ -258,7 +248,6 @@ btnStop.pack()
 
 container2 = Frame()
 container2.pack(pady = 30)
-
 
 LS = Label(container2, text = 'Status: ')
 LS.grid(row = 0, column = 0)

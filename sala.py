@@ -11,7 +11,6 @@ class sala:
 		if not nome in self.s:
 			aux = [[user],user]
 			self.s[nome] = aux
-			print 'Sala Criada: ',self.s
 			return True
 		return False
 
@@ -50,7 +49,6 @@ class sala:
 
 	def listaSalas(self):
 		nomes = []
-		print "Aqui: ",self.s
 		for i in self.s:
 			nomes.append(i)
 		return list(set(nomes))
@@ -75,8 +73,6 @@ class sala:
 
 	def removeUsuario(self, nome, nomeSala,conn):
 		for i in range(len(self.s[nomeSala][0])):
-			print 'LEN: ',len(self.s[nomeSala][0])
-			print 'Lista: ',self.s[nomeSala][0]
 			if len(self.s[nomeSala][0]) > 0 and self.s[nomeSala][0][i].nome == nome:
 				self.s[nomeSala][0][i].conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
 				self.s[nomeSala][0].pop(i)
@@ -109,11 +105,7 @@ class sala:
 		return 0
 
 	def removeTodos(self,nomeSala):
-		print self.s[nomeSala][0]
 		for i in range(len(self.s[nomeSala][0])):
 			if i != 0 :
 				self.s[nomeSala][0][i].conn.send(KEYCONTROLLER+"sair"+KEYCONTROLLER)
-		print("oi")
 
-		#self.s[nomeSala][0] = []
-		#self.s.pop(nomeSala)

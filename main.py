@@ -3,6 +3,7 @@ import socket, ttk, threading
 from Tkinter import *
 import tkMessageBox
 
+#BEEP--------------------------------------------------------------------------------------------------------------
 try:
 	import winsound
 except ImportError:
@@ -11,10 +12,13 @@ except ImportError:
 		os.system('( speaker-test -t sine -f %s )& pid=$! ; sleep 0.1s ; kill -9 $pid > tmp.tmp'%(frequency,))
 		os.system('( speaker-test -t sine -f %s )& pid=$! ; sleep 0.1s ; kill -9 $pid > tmp.tmp'%(100+frequency,))
 		os.system('rm tmp.tmp')
+	#playsound()
 else:
 	def playsound(frequency,duration):
 		winsound.Beep(frequency,duration)
 		winsound.Beep(frequency+100,duration+50)
+	#playsound()
+#FIM_BEEP----------------------------------------------------------------------------------------------------------
 
 def goServidor():
 	'''
@@ -42,6 +46,7 @@ def igBatePapo(titulo):
 	global textoSala
 	global inputTexto
 	global scrollbar
+	global muteButton
 	
 	root2 = Tk()
 	root2.geometry('380x335')
@@ -102,14 +107,15 @@ def igBatePapo(titulo):
 	labelEspacadora5 = Label(container2, text = '  ')
 	labelEspacadora5.grid(row = 2, column = 7)
 
-	emoteCryButton = Button(container2, width = 4, text = '(ಥ_ಥ)', command = cryPressed)
-	emoteCryButton.grid(row = 2, column = 8)
+	muteButton = Button(container2, width = 4, text = 'Mutar', command = mutePressed)
+	muteButton.grid(row = 2, column = 8)
 
 	#Fim emotes --------------------------------------------------------------------------------------------
 
 	root2.mainloop()
 #igBatePapo()
 
+#Funcoes dos emotes -----------------------------------------
 def tristePressed():
 	global inputTexto
 	inputTexto.insert(END, '(>▂<)')
@@ -133,12 +139,20 @@ def creepyPressed():
 	inputTexto.insert(END, '(ಠᴗಠ)')
 	inputTexto.focus_set()
 #creepyPressed()
+#Fim funções emotes-------------------------------------------
 
-def cryPressed():
-	global inputTexto
-	inputTexto.insert(END, '(ಥ_ಥ)')
-	inputTexto.focus_set()
-#cryPressed()
+def validarMensagem(msg):
+	'''
+		Verifica se a mensagem que o usuário digitou não contem apenas espaços em branco.
+		Retorna "True" caso a mensagem seja válida e "False" caso contrário.
+	'''
+	if (msg == ''): return False
+
+	for x in msg:
+		if (x != " "): return True
+
+	return False
+#verificarMensagem()
 
 def enviarMensagem(arg1=''):
 	'''
@@ -155,7 +169,7 @@ def enviarMensagem(arg1=''):
 
 	msg = inputTexto.get()
 
-	if msg == '' or saiu == True:
+	if not validarMensagem(msg) or saiu == True:
 		return
 
 	inputTexto.delete(0, len(msg))
@@ -214,7 +228,6 @@ def entrarSala():
 
 		# Cria a janela do bate papo
 		igBatePapo(titulo)
-
 #entrarSala()
 
 def criaSala():
@@ -222,7 +235,6 @@ def criaSala():
 		Abre uma conexão com o servidor, envia a mensagem CS (criar sala) para ele,
 		em seguida recebe uma confirmação do servidor, caso a mensagem de confirmação for
 		sala invalida (salaInvalida) é porque a sala já existe. 
-		para uma funcção especifica. 
 	'''
 	global nomeString
 	global nomeSalaString
@@ -234,12 +246,12 @@ def criaSala():
 	s.send(MESSAGE)
 	data = s.recv(BUFFER_SIZE)
 
-	titulo = "Sala: "+nomeSalaString+" | Usuario: "+nomeString
-
 	if data == KEYCONTROLLER+'salaInvalida'+KEYCONTROLLER: 
 		root.deiconify()
 		exibirMensagem("A sala já existe!", "Erro")
 	else:
+		titulo = "Sala: "+nomeSalaString+" | Usuario: "+nomeString
+
 		# Esta thread cuida de atualizar o campo onde as mensagens da sala aparecem
 		t2_stop = threading.Event()
 		t1 = threading.Thread(target = threadCaixaMensagens, args = (s, t2_stop))
@@ -247,7 +259,6 @@ def criaSala():
 
 		# Cria a janela do bate papo
 		igBatePapo(titulo)
-	
 #criaSala()
 
 def threadCaixaMensagens(s, eventoDeParada):
@@ -260,11 +271,11 @@ def threadCaixaMensagens(s, eventoDeParada):
 	global scrollbar
 	global saiu
 	global root
+	global isMutado
 
 	while not eventoDeParada.is_set():
 		if saiu: break
 		data = s.recv(BUFFER_SIZE)
-		
 
 		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: 
 			s.send("tchau")
@@ -272,7 +283,7 @@ def threadCaixaMensagens(s, eventoDeParada):
 			t2_stop.set()
 			break
 		else:
-			if(data.split(" ")[1].split(':')[0] != nomeString):
+			if(data.split(" ")[1].split(':')[0] != nomeString and not isMutado):
 				t4 = threading.Thread(target = playsound, args = (500,100))
 				t4.start()
 			textoSala.insert(END, data + '\n')
@@ -367,7 +378,6 @@ def setIp():
 	global root1
 
 	TCP_IP = ipServidorCampo.get()
-	print TCP_IP
 	root1.destroy()
 #setIp()
 
@@ -428,6 +438,18 @@ def okPressed():
 		root.withdraw()
 		entrarSala()
 #okPressed()
+
+def mutePressed():
+	'''
+		Invocada quando o botão de "Mutar" é pressionado. Troca o valor da variavel global 
+		que indica se está mutado ou não, troca o texto do botão e o seu tamanho.
+	'''
+	global isMutado
+	global muteButton
+	isMutado = False if(isMutado) else True
+	muteButton['text'] = 'Desmutar' if(muteButton['text'] == 'Mutar') else 'Mutar'
+	muteButton['width'] = 7 if(muteButton['width'] == 4) else 4
+#mutePressed()
 
 def salaSelecionada(event):
 	'''
@@ -507,7 +529,7 @@ def main():
 	mainloop()
 #Main()
 
-# Declarando variáveis globais
+# Declarando variáveis globais-----------------------------
 nomeSalaCampo = Entry
 nomeUsuarioCampo1 = Entry
 nomeUsuarioCampo2 = Entry
@@ -518,17 +540,17 @@ ipServidorCampo = Entry
 scrollbar = Scrollbar
 nomeSalaString = ''
 nomeString = ''
-
+isMutado = False
 root = Tk
 root1 = Tk
 root2 = Tk
-
+muteButton = Button
 saiu = False
 TCP_IP = ''
 btnOk = Button
 op = 0
 t2_stop = threading.Event()
-# Fim variáveis globais
+# Fim variáveis globais------------------------------------
 
 KEYCONTROLLER = '<ctrl>'
 TCP_PORT = 8000
