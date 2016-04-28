@@ -9,9 +9,8 @@ try:
 except ImportError:
 	import os
 	def playsound(frequency,duration):
-		os.system('( speaker-test -t sine -f %s )& pid=$! ; sleep 0.1s ; kill -9 $pid > tmp.tmp'%(frequency,))
-		os.system('( speaker-test -t sine -f %s )& pid=$! ; sleep 0.1s ; kill -9 $pid > tmp.tmp'%(100+frequency,))
-		os.system('rm tmp.tmp')
+		os.system('(( speaker-test -t sine -f %s )& pid=$! ; sleep 0.1s ; kill -9 $pid) > /dev/null'%(frequency,))
+		os.system('(( speaker-test -t sine -f %s )& pid=$! ; sleep 0.1s ; kill -9 $pid) > /dev/null'%(100+frequency,))
 	#playsound()
 else:
 	def playsound(frequency,duration):
@@ -37,6 +36,24 @@ def goServidor():
 	return s
 #GoServidor()
 
+def isFechou():
+	global root
+	global root2
+	global inputTexto
+	global textoSala
+	global nomeString
+	global nomeSalaString
+	global saiu
+
+	if not saiu:
+		s = goServidor()
+		MESSAGE = "EM"+KEYCONTROLLER+nomeString+KEYCONTROLLER+nomeSalaString+KEYCONTROLLER+'/sair'
+		s.send(MESSAGE.encode('utf8'))
+		data = s.recv(BUFFER_SIZE)
+	root2.destroy()
+	root.deiconify()		
+#isFechou
+
 def igBatePapo(titulo):
 	'''
 		Interface grafica da janeja "bate papo", onde é possivel enviar e
@@ -52,7 +69,7 @@ def igBatePapo(titulo):
 	root2.geometry('380x335')
 	root2.wm_title(titulo)
 	root2.resizable(0,0)
-
+	root2.protocol("WM_DELETE_WINDOW", isFechou)
 	container0 = Frame(root2)
 	container0.pack(padx = 10, pady = 10)
 
@@ -181,6 +198,7 @@ def enviarMensagem(arg1=''):
 	data = s.recv(BUFFER_SIZE)
 	if data == KEYCONTROLLER+"sair"+KEYCONTROLLER : 
 		root2.destroy()
+		root2 = False
 		root.deiconify()
 
 	if data == KEYCONTROLLER+"textoAjuda"+KEYCONTROLLER: 
@@ -279,6 +297,10 @@ def threadCaixaMensagens(s, eventoDeParada):
 
 		if data == KEYCONTROLLER+'sair'+KEYCONTROLLER: 
 			s.send("tchau")
+			try:
+				textoSala.insert(END, "\nVocê foi removido!\n")
+			except:
+				pass
 			saiu = True
 			t2_stop.set()
 			break
