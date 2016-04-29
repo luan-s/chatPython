@@ -53,14 +53,8 @@ class sala:
 			nomes.append(i)
 		return list(set(nomes))
 
-	def listaUsuarios(self,ip):
+	def listaUsuarios(self,ip,nomeSala):
 		nomes = []
-		nomeSala = ''
-		for i in self.s:
-			for j in self.s[i][0]:
-				if j.ip == ip:
-					nomeSala = i
-
 		for i in self.s[nomeSala][0]:
 			nomes.append(i.nome)
 		

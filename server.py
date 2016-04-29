@@ -136,18 +136,19 @@ def executaComando(comando, conn, ip,msg):
 	'''
 		Recebe o comando e encaminha para a função de tratamento.
 	'''
-	if(comando=="listar"): listar(ip,conn)
+	if(comando=="listar"): listar(ip,conn,msg)
 	if(comando=="sair"): sair(conn, comando, ip,msg)
 	if(comando=="ajuda"): ajuda(conn)
 	if(comando=="remover"): remove(conn, comando,ip,msg)
 #ececutaComando()
 
-def listar(ip,conn):
+def listar(ip,conn,msg):
 	'''
 		Lista todos usuarios dentro de uma sala
 	'''
+	nomeSala = salas.nomeSalaByUser(ip,msg[1])
 	aux = ''
-	lista = salas.listaUsuarios(ip)
+	lista = salas.listaUsuarios(ip,nomeSala)
 	for i in lista:
 		aux = aux + i + '\n'
 	aux = 'LUSER-'+aux
